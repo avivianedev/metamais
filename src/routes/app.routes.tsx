@@ -10,6 +10,8 @@ import History from '../views/History/History';
 import { StyleSheet, View } from 'react-native';
 
 import { Feather } from '@expo/vector-icons'
+import Entypo from '@expo/vector-icons/Entypo';
+
 
 export function AppRoutes() {
     return (
@@ -28,15 +30,18 @@ export function AppRoutes() {
                     //paddingTop: 6,
                     //marginBottom: 20
                 },
-                tabBarActiveTintColor: '#ffffff',
+                tabBarActiveTintColor: '#fff',
                 tabBarInactiveTintColor: '#ccc',
+                
             }}
 
             >
                 <Screen name='Home' component={Home} options={{
                     tabBarIcon: () => {
-                        return <Feather name='home' color={'white'} size={25} />
-                    }
+
+                        return  <Feather name='home' color={'white'} size={25} /> 
+                    }                        
+                            
                 }} />
                 <Screen name='Produção' component={NewProduction} options={{
                     tabBarIcon: () => {
@@ -70,6 +75,11 @@ const style = StyleSheet.create({
         borderTopRightRadius: 14,
         backgroundColor: '#6C5DD3'
 
+    },
+    active:{
+       
+        
+        
     }
 
 })

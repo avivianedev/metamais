@@ -45,7 +45,12 @@ export default function Home() {
         value={162000}
         missing={8064.03} />
 
-      
+      <Card
+        isLarge={true}
+        title="Imobiliário"
+        percent={83}
+        value={162000}
+        missing={8064.03} />
 
 
       <StatusBar style="auto" />
@@ -56,7 +61,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    //backgroundColor: '#fff',
+    height:'100%',
     justifyContent:'center',
     alignItems: 'center',
     gap: 24,

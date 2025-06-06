@@ -4,9 +4,6 @@ import { useFonts } from "expo-font";
 import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import Card from '../../components/Card/Card';
 
-
-
-
 export default function Home() {
 
   const [fontsLoaded] = useFonts({

@@ -4,25 +4,39 @@ import { useState } from "react";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import uuid from 'react-native-uuid';
 import { Product } from "../../models/Product";
-import { getData, storeData } from "../../controllers/productsController";
+import { storeData } from "../../controllers/productsController";
+import { SucessMessage } from "../../components/Modal/SucessMessage";
 
 const NewProduct = () => {
 
     const [nameProduct, SetNameProduct] = useState('')
     const [segment, SetSegment] = useState('')
     const [goal, SetGoal] = useState('')
+    const [modalVisible, setModalVisible] = useState(false);
 
-    const product : Product = {
-        id: uuid.v4(),
-        name: nameProduct,
-        segment: segment,
-        goal: parseFloat(goal),       
-        produced: 0,
-        remaining: parseFloat(goal),  
-        percent: 0,
+
+
+    const handleSubmit = async () => {
+
+        const product: Product = {
+            id: uuid.v4(),
+            name: nameProduct,
+            segment: segment,
+            goal: parseFloat(goal.replace(/\./g, '').replace(',', '.')),
+            produced: 0,
+            remaining: parseFloat(goal.replace(/\./g, '').replace(',', '.')),
+            percent: 0,
+        };
+        const result = await storeData(product);
+
+        if (result) {
+            setModalVisible(true);
+            SetNameProduct('')
+            SetSegment('')
+            SetGoal('')
+            
+        }
     };
-   
- 
 
     return (
         <View style={styles.container}>
@@ -42,6 +56,7 @@ const NewProduct = () => {
                 onChangeText={test => SetSegment(test)}
                 style={styles.input}
                 placeholderTextColor={'black'}
+
             />
 
             <TextInput
@@ -50,8 +65,14 @@ const NewProduct = () => {
                 onChangeText={test => SetGoal(test)}
                 style={styles.input}
                 placeholderTextColor={'black'}
+                keyboardType="numeric"
             />
 
+            <SucessMessage
+                texto="Cadastro realizado com sucesso!"
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+            />
 
             <View style={styles.checkbox}>
                 <Checkbox />
@@ -59,7 +80,8 @@ const NewProduct = () => {
             </View>
 
 
-            <TouchableOpacity style={styles.button} onPress={() => storeData(product)}>
+
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Cadastrar</Text>
             </TouchableOpacity>
         </View>
@@ -96,6 +118,7 @@ const styles = StyleSheet.create({
         height: 38,
         opacity: .5,
         //marginTop: 25
+        fontWeight: 700
 
     },
     button: {
@@ -125,4 +148,5 @@ const styles = StyleSheet.create({
         gap: 10
     }
 })
+
 

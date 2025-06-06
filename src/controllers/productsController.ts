@@ -1,15 +1,26 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Product } from "../models/Product";
+import { Alert } from "react-native";
 
-export const storeData = async (product: Product) => {
+
+export const storeData = async (product: Product) : Promise<boolean> => {       
 
     try {
+
+
+        if (!product.name.trim() || !product.segment.trim() || !product.goal) {
+            Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
+            return false
+        }
         const jsonValue = JSON.stringify(product);
         await AsyncStorage.setItem(`product-${product.id}`, jsonValue);
         console.log('Produto salvo com sucesso!');
+        return true      
+        
 
     } catch (e) {
         console.log('Erro ao cadastrar Produto', e)
+        return false
     }
 };
 
@@ -23,9 +34,14 @@ export const getData = async () => {
 
         const products = stores.map(([key, value]) => value && JSON.parse(value));
 
-        //const jsonValue = await AsyncStorage.getItem(`product-`);
-        console.log(products)
+        return products
     } catch (e) {
         console.log('Erro ao ler o Produto', e)
+        return [];
     }
 };
+
+
+export const clearAllProducts = async () => {
+    await AsyncStorage.clear();
+} 

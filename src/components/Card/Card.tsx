@@ -13,8 +13,8 @@ const Card = ({isLarge, title, percent, value, missing} : any) => {
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.title}>% {percent}</Text>
             </View>
-            <Text style={styles.value}>R$ {value}</Text>
-            <Text style={styles.missing}>Falta: R$ {missing}</Text>
+            <Text style={styles.value}>{value}</Text>
+            <Text style={styles.missing}>Falta: {missing}</Text>
         </View>
     )
 }
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     
     largeCard: {
         padding: 10,
-        width: '90%',
+        width: '100%',
         height: 100,
         borderRadius: 16,
         //opacity: .5,
@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
         //backgroundColor: "#8E7EFF",
         //backgroundColor: '#E5E6F0',
         borderWidth: .8,
+        marginBottom: 16
 
 
     },

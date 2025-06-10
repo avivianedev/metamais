@@ -1,16 +1,24 @@
 import { useState } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
-const Checkbox = () => {
+type CheckboxProps = {
 
-    const [check, SetCheck] = useState(false)
+    value: boolean
+    onChange: (value: boolean) => void;
+};
+
+const Checkbox = ({value, onChange} : CheckboxProps)  => {
 
     return (
 
         <TouchableOpacity
-            style={ [styles.checkboxBase, check ? styles.unchecked : styles.checked]}
-            onPress={() => SetCheck(!check)}></TouchableOpacity>
+            style={[styles.checkboxBase, value ? styles.unchecked : styles.checked]}
+            onPress={() => onChange(!value)}>
+
+        </TouchableOpacity>
+
     )
+
 }
 
 export default Checkbox
@@ -26,11 +34,11 @@ const styles = StyleSheet.create({
     },
 
     checked: {
-        backgroundColor: 'transparent',       
+        backgroundColor: 'transparent',
         borderColor: '#8E7EFF'
     },
     unchecked: {
-        backgroundColor: '#8E7EFF',        
+        backgroundColor: '#8E7EFF',
         borderColor: '#8E7EFF'
     }
 })

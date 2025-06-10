@@ -5,13 +5,17 @@ import { Alert } from "react-native";
 
 export const storeData = async (product: Product) : Promise<boolean> => {       
 
-    try {
-
+    try {        
 
         if (!product.name.trim() || !product.segment.trim() || !product.goal) {
             Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
             return false
         }
+
+        if(product.hasChildren){
+            //
+        }
+
         const jsonValue = JSON.stringify(product);
         await AsyncStorage.setItem(`product-${product.id}`, jsonValue);
         console.log('Produto salvo com sucesso!');
@@ -24,7 +28,14 @@ export const storeData = async (product: Product) : Promise<boolean> => {
     }
 };
 
+export const storeListChildren = ( product : string,  goal: number ) => {
+    const listChildren = []
+    listChildren.push(product)
+    listChildren.push(goal)
 
+    return listChildren
+
+}
 
 export const getData = async () => {
     try {

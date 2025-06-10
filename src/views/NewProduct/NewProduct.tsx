@@ -6,15 +6,23 @@ import uuid from 'react-native-uuid';
 import { Product } from "../../models/Product";
 import { storeData } from "../../controllers/productsController";
 import { SucessMessage } from "../../components/Modal/SucessMessage";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { AddChildrenGoals } from "./AddChildrenGoals";
+import { FormProduct } from "../../components/FormProduct/FormProduct";
+
 
 const NewProduct = () => {
 
-    const [nameProduct, SetNameProduct] = useState('')
-    const [segment, SetSegment] = useState('')
-    const [goal, SetGoal] = useState('')
+    const [nameProduct, setNameProduct] = useState('')
+    const [segment, setSegment] = useState('')
+    const [goal, setGoal] = useState('')
     const [modalVisible, setModalVisible] = useState(false);
+    const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
+    const [showModal, setShowModal] = useState(false)
+    const [data, setData] = useState<{ name: string; goal: number }[]>([]);
 
 
+    console.log('O valor de data dentro do NewProduct', data)
 
     const handleSubmit = async () => {
 
@@ -22,50 +30,39 @@ const NewProduct = () => {
             id: uuid.v4(),
             name: nameProduct,
             segment: segment,
-            goal: parseFloat(goal.replace(/\./g, '').replace(',', '.')),
+            goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
+            //goal : sanitizeCurrencyInput(goal),
             produced: 0,
-            remaining: parseFloat(goal.replace(/\./g, '').replace(',', '.')),
+            remaining: parseFloat(goal.replace(/\./g, '')),
             percent: 0,
+            hasChildren: hasChildrenGoals,
+            children: data
         };
+
         const result = await storeData(product);
 
         if (result) {
             setModalVisible(true);
-            SetNameProduct('')
-            SetSegment('')
-            SetGoal('')
-            
+            setNameProduct('')
+            setSegment('')
+            setGoal('')
+            setHasChildrenGoals(false)
+            setShowModal(false)
+            setData([])
         }
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Cadastrar Produto</Text>
+        <View style={styles.container}>           
 
-            <TextInput
-                placeholder="Nome do Produto"
-                value={nameProduct}
-                onChangeText={test => SetNameProduct(test)}
-                style={styles.input}
-                placeholderTextColor={'black'}
-            />
-
-            <TextInput
-                placeholder="Nome do Segmento"
-                value={segment}
-                onChangeText={test => SetSegment(test)}
-                style={styles.input}
-                placeholderTextColor={'black'}
-
-            />
-
-            <TextInput
-                placeholder="Meta em R$"
-                value={goal}
-                onChangeText={test => SetGoal(test)}
-                style={styles.input}
-                placeholderTextColor={'black'}
-                keyboardType="numeric"
+            <FormProduct
+                title={'Cadastro de Produtos'}
+                nameProduct={nameProduct}
+                setNameProduct={setNameProduct}
+                segment={segment}
+                setSegment={setSegment}
+                goal={goal}
+                setGoal={setGoal}
             />
 
             <SucessMessage
@@ -74,12 +71,45 @@ const NewProduct = () => {
                 onClose={() => setModalVisible(false)}
             />
 
+
             <View style={styles.checkbox}>
-                <Checkbox />
-                <Text>Esse produto possui metas vinculadas</Text>
+                <Checkbox
+                    value={hasChildrenGoals}
+                    onChange={setHasChildrenGoals}
+                />
+                <Text >Esse produto possui metas vinculadas</Text>
             </View>
 
 
+            {hasChildrenGoals && 
+            
+            <View style={styles.childrenGoals}>
+                <TouchableOpacity onPress={() => setShowModal(!showModal)}>
+                    <AntDesign name="pluscircleo" size={18} color="#3D3D3D" />
+                </TouchableOpacity>
+                <Text style={styles.TextchildrenGoals}>Adicionar a meta vinculada</Text>
+            </View>}
+
+            {showModal && <AddChildrenGoals
+                onChange={setShowModal}
+                value={showModal}
+                childData={setData}
+            />
+
+            }
+
+            {data.length > 0 && (
+                <View style={styles.renderDataChildContainer}>
+                    {data.map((e, index: number) => (
+                        <View key={index} style={styles.renderDataChildContent}>
+                            <Text>{e.name}</Text>
+                            <Text>{e.goal}</Text>
+                        </View>
+
+                    ))}
+
+                </View>
+            )}
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Cadastrar</Text>
@@ -101,26 +131,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 24,
     },
-    title: {
-        fontSize: 18,
-        fontFamily: 'Inter_400Regular',
-        color: '#3D3D3D',
 
-    },
-    input: {
-        width: '90%',
-        borderColor: '#8E7EFF',
-        //backgroundColor: "transparente",
-        borderWidth: 2,
-        borderRadius: 10,
-        alignItems: 'center',
-        paddingLeft: 10,
-        height: 38,
-        opacity: .5,
-        //marginTop: 25
-        fontWeight: 700
-
-    },
     button: {
         width: '70%',
         height: 48,
@@ -132,7 +143,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 40
+        marginTop: 20
     },
     buttonText: {
         color: '#fff',
@@ -145,7 +156,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        gap: 10,
+        color: '#3D3D3D'
+    },
+    childrenGoals: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 14,
+    },
+    TextchildrenGoals: {
+        fontSize: 14,
+        fontFamily: 'Inter_400Regular',
+        textAlign: 'left',
+        color: '#3D3D3D',
+        gap: 0,
+    },
+    renderDataChildContainer: {
+        width: '80%',
         gap: 10
+    },
+    renderDataChildContent: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderColor: 'black',
+        //borderWidth: .5,
+        padding: 2
     }
 })
 

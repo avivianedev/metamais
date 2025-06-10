@@ -7,6 +7,7 @@ import Card from './src/components/Card/Card';
 import Home from './src/views/Home/Home';
 import { AppRoutes } from './src/routes/app.routes';
 
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 
 export default function App() {
@@ -25,22 +26,24 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Header />
-      
 
       <StatusBar style="auto" />
-      <AppRoutes/>
+      <ActionSheetProvider>
+        <AppRoutes />
+      </ActionSheetProvider>
+
     </View>
-    
+
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',   
+    backgroundColor: '#fff',
 
 
   },
- 
+
 
 });

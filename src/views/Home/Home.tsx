@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { useFonts } from "expo-font";
 import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import Card from '../../components/Card/Card';
@@ -15,24 +15,27 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function Home() {
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
+  console.log('Valor de produtos', products)
   //clearAllProducts()
 
   useFocusEffect(
-  useCallback(() => {
+    useCallback(() => {
 
-    const fetchData = async () => {
-      const result = await getData();
-      setProducts(result.sort());
+      const fetchData = async () => {
+        const result = await getData();
+        setProducts(result.sort());
 
-    };
+      };
 
-    fetchData()
+      fetchData()
 
-  }, [])
+    }, [])
 
-)
-  console.log('Valor de data', products)
+  )
+  console.log('Valor de data', ...products)
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -58,14 +61,23 @@ export default function Home() {
 
         renderItem={({ item }) => (
           (
-            <Card
-              isLarge={true}
-              title={item.name}
-              percent={item.percent}
-              value={formatCurrency(item.goal)}
-              missing={formatCurrency(item.remaining)}
+            <TouchableOpacity onPress={() => {
+              setSelectedProduct(item);           
 
-            />
+              //setShowEditModal(true);
+            }}>
+
+              
+              <Card
+                isLarge={true}
+                title={item.name}
+                percent={item.percent}
+                value={formatCurrency(item.goal)}
+                missing={formatCurrency(item.remaining)}
+                children={item.children}
+
+              />
+            </TouchableOpacity>
           )
         )}
       />

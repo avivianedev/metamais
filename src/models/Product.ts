@@ -5,5 +5,7 @@ export interface Product {
     goal: number;
     produced: number;
     remaining: number;
-    percent: number
+    percent: number,
+    hasChildren: boolean,
+    children?: { name: string; goal: number }[];
 }

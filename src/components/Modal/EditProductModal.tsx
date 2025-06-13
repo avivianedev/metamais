@@ -11,9 +11,8 @@ import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
 type editProps = {
     onClose: () => void;
     data: any[]
+
 }
-
-
 
 export const EditProductModal = ({ onClose, data }: editProps) => {
 
@@ -22,34 +21,36 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
     const [goal, setGoal] = useState('')
 
     const [showEditChild, setShowEditChild] = useState(false)
+    const [showListChild, setShowListChild] = useState(false)
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
 
     const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
     const [dataChild, setDataChild] = useState<{ name: string; goal: number }[]>([]);
-
-    console.log('VAlor de dataChild', dataChild)
-
-
+    
     const handleUpdate = async () => {
 
-       const sanitizedGoal = sanitizeCurrencyInput(goal);
+        const sanitizedGoal = sanitizeCurrencyInput(goal);
 
+        const updatedChildren = data[0].children.map(
+            (item: { name: string; goal: number }, index: number) =>
+                index === editingChildIndex ? dataChild[0] : item
+        );     
 
         const product: Product = {
             id: data[0].id,
             name: nameProduct,
-            segment: segment,           
-            goal: sanitizedGoal,         
+            segment: segment,
+            goal: sanitizedGoal,
             produced: 0,
             remaining: parseFloat(goal.replace(/\./g, '')),
             percent: 0,
             hasChildren: hasChildrenGoals,
-            children: data[0].children
+            children: updatedChildren
+
         };
 
-        console.log('VALOR DE GOAL', goal)
-
         const result = await storeData(product);
+
         if (result) {
             Alert.alert('Produto Alterado com sucesso!')
             onClose()
@@ -58,31 +59,41 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
     }
 
     const handleEditChild = (id: number) => {
-        console.log('Meu ID é: ', id)
-        const metaSelecao = data[0].children[id]
-        console.log('Meta filha selecionada,', metaSelecao)
-        const filterMeta = data[0].children.filter((item : any) => item !== metaSelecao)
-        console.log('Retorno de Filter', filterMeta)
-        console.log('Retorno de setEditingChildIndex', editingChildIndex)
+        console.log('Index a ser trabalhado:', id);
+        setShowEditChild(true)
         setEditingChildIndex(id)
-        return 
+
     }
 
-    useEffect(() => {       
+    useEffect(() => {
+
+        if (editingChildIndex !== null) {
+            setShowEditChild(true);
+            //console.log('Indice atualizado:', editingChildIndex)
+        }
+        // if (dataChild.length > 0) {
+        //     console.log('Reconheco o valor true de data child.')
+        //     //const result = data[0].children.map((item: any, index: number) => index === 0 ? dataChild : item)
+
+        //     //console.log('Valor depois do MAP', result)
+        // } else {
+        //     console.log('NÂO Reconheco o valor true de data child')
+        // }
+
 
         if (data && data.length > 0) {
             setNameProduct(data[0].name);
             setSegment(data[0].segment);
-            setGoal(formatCurrencyInput(data[0].goal)); // <-- aqui
+            setGoal(formatCurrencyInput(data[0].goal));
 
-            console.log('Valor do Goal recebido no IF', goal)
+
 
             if (data[0].children.length > 0) {
-                setShowEditChild(true)
+                setShowListChild(true)
                 return
 
             } else {
-                Alert.alert('Esse Produto não possui meta associada')
+                //Alert.alert('Esse Produto não possui meta associada')
                 setShowEditChild(false)
                 return
             }
@@ -125,7 +136,6 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                 onChangeText={setGoal}
                 style={styles.input}
                 placeholderTextColor={'white'}
-            //keyboardType="numeric"
             />
 
 
@@ -134,7 +144,7 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
             </TouchableOpacity>
 
 
-            {showEditChild && (
+            {showListChild && (
 
                 <>
                     {data[0].children.map((e: any, index: number) =>
@@ -158,28 +168,23 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                                 </View>
                             </View>
 
-                            {/* {editingChildIndex === index &&
-                                //<View style={styles.editingChildContainer}>
-                                <AddChildrenGoals
-                                    value={true}
-                                    childData={setDataChild}
-                                    onChange={() => setEditingChildIndex(null)}
-                                />
-                                //</View>
-                            } */}
-
                         </View>
 
                     )
                     )}
 
-                    {editingChildIndex !== null && (
+                    {editingChildIndex !== null && showEditChild &&(
                         <View style={styles.editingChildContainer}>
                             <AddChildrenGoals
                                 value={true}
                                 childData={setDataChild}
-                                onChange={() => setEditingChildIndex(null)}
+                                onChange={() => {
+                                    setShowEditChild(!showEditChild)
+                                    setShowListChild(showEditChild)
+                                }}
                                 title="Atualizar Metas Vinculadas"
+                                textBtn = 'Atualizar'
+                                initialChild={data[0].children[editingChildIndex]}
                             />
                         </View>
                     )}

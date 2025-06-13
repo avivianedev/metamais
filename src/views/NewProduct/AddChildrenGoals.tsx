@@ -1,47 +1,73 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { storeListChildren } from "../../controllers/productsController";
+import { formatCurrencyInput } from "../../utils/formatCurrency";
+//import { storeListChildren } from "../../controllers/productsController";
 
 type typePropsModal = {
     onChange: (value: boolean) => void;
-    value: boolean  
+    value: boolean
     childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number }[]>>;
+    title: string
+    textBtn : string
+    initialChild?: { name: string; goal: number }; //
+    
 };
 
-export const AddChildrenGoals = ({onChange , value, childData} : typePropsModal ) => {   
+export const AddChildrenGoals = ({ onChange, value, childData, title, initialChild, textBtn }: typePropsModal) => {
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
-    const [goalChildren, SetGoalChildren] = useState('')    
-    //const [data, setData] = useState<{ name: string; goal: number }[]>([]);
+    const [goalChildren, SetGoalChildren] = useState('')
+
+    
+    useEffect(() => {
+        if (initialChild) {
+            SetNameProductChildren(initialChild.name);
+            SetGoalChildren(formatCurrencyInput(initialChild.goal)); 
+        }
+    }, [initialChild]);
 
     const ListChildren = () => {
-        
-        let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
-        const listChildren = []
-        listChildren.push(nameProductChildren)
-        listChildren.push(goal)
-        
-        const newChild = {
-            name: nameProductChildren,
-            goal: goal
+
+        try {
+
+            if (!nameProductChildren.trim() || !goalChildren.trim()) {
+                Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
+                return false
+            }
+            
+            let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
+            const listChildren = []
+            listChildren.push(nameProductChildren)
+            listChildren.push(goal)           
+
+            const newChild = {
+                name: nameProductChildren,
+                goal: goal
+            }
+
+            //SetNameProductChildren('')
+            //SetGoalChildren('')
+            childData(prev => [...prev, newChild])
+            Alert.alert('Produto Adicionado')
+            onChange(false)
+
+            //console.log('Retorno ao clicar no Modal de ADD tarefas adicionar', newChild)
+            return newChild
+
+        } catch (error) {
+            console.log('Erro ao adicionar meta vinculada')
         }
 
-        SetNameProductChildren('')
-        SetGoalChildren('')
-        childData(prev => [...prev, newChild])
-        Alert.alert('Produto Adicionado')
-        onChange(false)
 
-        return childData
-        
+
     }
-    
+
 
     return (
 
         <View style={styles.container}>
-            <Text style={styles.title}>Cadastrar Meta Vinculada</Text>
+            <Text style={styles.title}>{title}</Text>
             <TouchableOpacity style={styles.iConClose} onPress={() => onChange(!value)} >
                 <AntDesign name="close" size={24} color="white" />
             </TouchableOpacity>
@@ -64,7 +90,7 @@ export const AddChildrenGoals = ({onChange , value, childData} : typePropsModal 
             />
 
             <TouchableOpacity style={styles.button} onPress={() => ListChildren()}>
-                <Text style={styles.buttonText}>Adicionar</Text>
+                <Text style={styles.buttonText}>{textBtn}</Text>
             </TouchableOpacity>
 
         </View>
@@ -86,7 +112,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         backgroundColor: '#6C5DD3',
         position: 'absolute',
-        top: '25%',
+        top: '15%',
         zIndex: 2,
 
     },
@@ -104,7 +130,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         paddingLeft: 10,
-        height: 38,        
+        height: 38,
         fontWeight: '500',
         color: 'white'
 

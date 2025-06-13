@@ -22,9 +22,6 @@ const NewProduct = () => {
     const [showModal, setShowModal] = useState(false)
     const [data, setData] = useState<{ name: string; goal: number }[]>([]);
 
-
-    console.log('O valor de data dentro do NewProduct', data)
-
     const handleSubmit = async () => {
 
         const product: Product = {
@@ -32,14 +29,13 @@ const NewProduct = () => {
             name: nameProduct,
             segment: segment,
             goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
-            //goal : sanitizeCurrencyInput(goal),
             produced: 0,
             remaining: parseFloat(goal.replace(/\./g, '')),
             percent: 0,
             hasChildren: hasChildrenGoals,
             children: data
         };
-
+        
         const result = await storeData(product);
 
         if (result) {
@@ -96,6 +92,9 @@ const NewProduct = () => {
                 value={showModal}
                 childData={setData}
                 title="Cadastrar Meta Vinculada"
+                initialChild={data[0]} // ou qualquer item da lista
+                //editingIndex={index} // se quiser editar no array
+                textBtn={'Cadastrar'}
             />
 
             }

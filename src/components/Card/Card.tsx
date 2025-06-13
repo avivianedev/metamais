@@ -1,20 +1,29 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Inter_400Regular } from '@expo-google-fonts/inter';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useState } from "react";
 import { formatCurrency } from "../../utils/formatCurrency";
 
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { EditProductModal } from "../Modal/EditProductModal ";
+import { EditProductModal } from "../Modal/EditProductModal";
+import { getItem } from "../../controllers/productsController";
+import { Product } from "../../models/Product";
 
 
 
-const Card = ({ isLarge, title, percent, value, missing, children }: any) => {
+const Card = ({ isLarge, id, title, percent, value, missing, children }: any) => {
 
     const [showChildrenGoals, setShowChildrenGoals] = useState(false);
     const { showActionSheetWithOptions } = useActionSheet();
-
     const [showEditModal, setShowEditModal] = useState(false)
+    const [dataRecoverer, setDataRecoverer] = useState<any | null>(null)
+    const [refreshList, setRefreshList] = useState(false);
+
+    const handleGetItem = async (id: string) => {
+        const selectedProduct = await getItem(id)
+        //console.log('Retorno do selectedProduct que pega o ID', selectedProduct)
+        setDataRecoverer(selectedProduct)
+    }
 
     const openOptions = () => {
         const options = ['Alterar dados', 'Excluir dados', 'Nova meta', 'Cancelar'];
@@ -29,7 +38,9 @@ const Card = ({ isLarge, title, percent, value, missing, children }: any) => {
             (selectedIndex) => {
                 switch (selectedIndex) {
                     case 0:
-                        setShowEditModal(!showEditModal)
+                        setShowEditModal(true)
+                        handleGetItem(id)
+
                         break;
                     case 1:
                         // Excluir dados
@@ -47,15 +58,23 @@ const Card = ({ isLarge, title, percent, value, missing, children }: any) => {
     return (
         <View>
 
-            {showEditModal &&
-
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showEditModal}
+                onRequestClose={() => setShowEditModal(false)}
+            >
                 <EditProductModal
-                    onChange={setShowEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    data={dataRecoverer}
+
                 />
-            }
+            </Modal>
+
             <TouchableOpacity
                 onLongPress={openOptions}
                 style={[isLarge ? styles.largeCard : styles.smallCard]}
+
 
             >
                 <View style={styles.cardHeader}>
@@ -64,8 +83,6 @@ const Card = ({ isLarge, title, percent, value, missing, children }: any) => {
                 </View>
                 <Text style={styles.value}>{value}</Text>
                 <Text style={styles.missing}>Falta: {missing}</Text>
-
-
 
                 {children?.length > 0 && (
 
@@ -96,6 +113,8 @@ const Card = ({ isLarge, title, percent, value, missing, children }: any) => {
                 )}
             </TouchableOpacity>
 
+
+
         </View>
 
     )
@@ -111,10 +130,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 'auto',
         borderRadius: 16,
-        //opacity: .5,
         borderColor: '#003459',
-        //backgroundColor: "#8E7EFF",
-        //backgroundColor: '#E5E6F0',
         borderWidth: .8,
         marginBottom: 16
 

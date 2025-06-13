@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import { useState } from "react";
 import Checkbox from "../../components/Checkbox/Checkbox";
@@ -9,6 +9,7 @@ import { SucessMessage } from "../../components/Modal/SucessMessage";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { AddChildrenGoals } from "./AddChildrenGoals";
 import { FormProduct } from "../../components/FormProduct/FormProduct";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 
 const NewProduct = () => {
@@ -53,7 +54,7 @@ const NewProduct = () => {
     };
 
     return (
-        <View style={styles.container}>           
+        <View style={styles.container}>
 
             <FormProduct
                 title={'Cadastro de Produtos'}
@@ -81,35 +82,46 @@ const NewProduct = () => {
             </View>
 
 
-            {hasChildrenGoals && 
-            
-            <View style={styles.childrenGoals}>
-                <TouchableOpacity onPress={() => setShowModal(!showModal)}>
-                    <AntDesign name="pluscircleo" size={18} color="#3D3D3D" />
-                </TouchableOpacity>
-                <Text style={styles.TextchildrenGoals}>Adicionar a meta vinculada</Text>
-            </View>}
+            {hasChildrenGoals &&
+
+                <View style={styles.childrenGoals}>
+                    <TouchableOpacity onPress={() => setShowModal(!showModal)}>
+                        <AntDesign name="pluscircleo" size={18} color="#3D3D3D" />
+                    </TouchableOpacity>
+                    <Text style={styles.TextchildrenGoals}>Adicionar a meta vinculada</Text>
+                </View>}
 
             {showModal && <AddChildrenGoals
                 onChange={setShowModal}
                 value={showModal}
                 childData={setData}
+                title="Cadastrar Meta Vinculada"
             />
 
             }
 
-            {data.length > 0 && (
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scrollContainer}
+                keyboardShouldPersistTaps="handled"
+            >
+               
+
+                {data.length > 0 && (
                 <View style={styles.renderDataChildContainer}>
                     {data.map((e, index: number) => (
                         <View key={index} style={styles.renderDataChildContent}>
                             <Text>{e.name}</Text>
-                            <Text>{e.goal}</Text>
+                            <Text>{formatCurrency(e.goal)}</Text>
                         </View>
 
                     ))}
 
                 </View>
             )}
+            </ScrollView>
+
+            
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Cadastrar</Text>
@@ -124,12 +136,12 @@ export default NewProduct
 
 const styles = StyleSheet.create({
     container: {
-        padding: 24,
+        padding: 15,
         width: '100%',
         height: '100%',
         //justifyContent: 'center',
         alignItems: 'center',
-        gap: 24,
+        gap: 10,
     },
 
     button: {
@@ -184,6 +196,9 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         //borderWidth: .5,
         padding: 2
+    }, scrollContainer: {
+        padding: 20,
+        paddingBottom: 60, // ou mais, pra garantir espaço abaixo do botão
     }
 })
 

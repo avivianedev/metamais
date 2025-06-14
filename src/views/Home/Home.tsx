@@ -8,8 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Product } from '../../models/Product';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useFocusEffect } from '@react-navigation/native';
-
-
+import { useSearch } from '../../components/context/SearchContext';
 
 
 export default function Home() {
@@ -17,7 +16,20 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [refreshList, setRefreshList] = useState(false);
 
+  const { search } = useSearch();
+  console.log("input na Home", search)
 
+
+  const searchResult = search ? products.filter(item => {
+    return item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.children?.[0]?.name.toLowerCase().includes(search.toLowerCase())
+  }
+
+  ) : products
+
+
+  
+  console.log('Retorno do FIltro', searchResult)
   //clearAllProducts()
 
   useFocusEffect(
@@ -52,7 +64,7 @@ export default function Home() {
 
       <FlatList
 
-        data={products}
+        data={searchResult}
         style={styles.list}
         contentContainerStyle={{
           paddingBottom: 100,

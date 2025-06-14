@@ -3,10 +3,16 @@ import { Inter_400Regular } from '@expo-google-fonts/inter';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useState } from "react";
+import { useSearch } from "../context/SearchContext";
 
 
 
 const Header = () => {
+
+    const { search, setSearch } = useSearch();
+
+    //console.log('Valor do inputSearch', search)
 
     return (
         <LinearGradient
@@ -21,7 +27,11 @@ const Header = () => {
             </View>
             <View style={styles.inputContainer}>
                 <AntDesign name="search1" size={18} color="white" />
-                <TextInput style={styles.input}></TextInput>
+                <TextInput style={styles.input}
+                value={search}
+                onChangeText={text => setSearch(text)}
+                
+                ></TextInput>
             </View>
         </LinearGradient>
     )

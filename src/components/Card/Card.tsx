@@ -17,12 +17,19 @@ const Card = ({ isLarge, id, title, percent, value, missing, children }: any) =>
     const { showActionSheetWithOptions } = useActionSheet();
     const [showEditModal, setShowEditModal] = useState(false)
     const [dataRecoverer, setDataRecoverer] = useState<any | null>(null)
-    const [refreshList, setRefreshList] = useState(false);
+
+    //const missingValue = children[0].produced - value
+    //console.log('Children', children)
 
     const handleGetItem = async (id: string) => {
         const selectedProduct = await getItem(id)
         //console.log('Retorno do selectedProduct que pega o ID', selectedProduct)
         setDataRecoverer(selectedProduct)
+    }
+
+    const calculoPErcentual = (producao: number, metaFinal: number) => {
+        const result = (producao / metaFinal) * 100
+        return result
     }
 
     const openOptions = () => {
@@ -96,13 +103,21 @@ const Card = ({ isLarge, id, title, percent, value, missing, children }: any) =>
                             <View style={styles.containerChildValue}>
                                 <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
 
-                                {children.map((child: { name: string, goal: number }, index: number) => (
+                                {children.map((child: { name: string, goal: number, produced: number }, index: number) => (
+                                    <View style={styles.childContent}>
 
-                                    <View style={styles.childValues} key={index}>
-                                        <Text style={styles.childName}>{child.name}</Text>
-                                        <Text style={styles.childGoal}>{formatCurrency(child.goal)}</Text>
+                                        <View style={styles.childValues} key={index}>
+                                            <Text style={styles.childName}>{child.name}</Text>
+                                            {/* <Text style={styles.childGoal}>{formatCurrency(child.goal)}</Text> */}
+                                            <Text style={styles.produced}>{formatCurrency(child.produced)}</Text>
 
+
+                                        </View>
+                                        <View style={styles.producedValues}>
+                                            <Text style={styles.percent}>{calculoPErcentual(child.produced, child.goal)} %</Text>
+                                        </View>
                                     </View>
+
                                 ))}
                             </View>
                             :
@@ -180,7 +195,15 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 5
+        gap: 8,
+        
+    },
+    childContent: {
+        borderWidth: .8,
+        borderColor: '#fff',
+        borderRadius: 10,
+        padding: 10,
+        backgroundColor: '#D7C7FF'
     },
     childValues: {
         width: '100%',
@@ -191,14 +214,23 @@ const styles = StyleSheet.create({
     },
     childName: {
         fontFamily: 'Inter_400Regular',
-        color: '#3D3D3D',
+        color: 'black',
         fontSize: 14,
-        fontWeight: 700,
+        fontWeight: 600,
     },
-    childGoal: {
+    produced: {
         fontFamily: 'Inter_400Regular',
-        color: '#3D3D3D',
+        color: 'black',
         fontSize: 14,
-        fontWeight: 700,
+        fontWeight: 600,
+    },
+    percent: {
+        fontFamily: 'Inter_400Regular',
+        color: 'black',
+        fontSize: 14,
+        fontWeight: 600,
+    },
+    producedValues: {
+        alignSelf: 'flex-end'
     }
 })

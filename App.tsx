@@ -8,6 +8,7 @@ import Home from './src/views/Home/Home';
 import { AppRoutes } from './src/routes/app.routes';
 
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { SearchProvider } from './src/components/context/SearchContext';
 
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
 
 
   return (
+    <SearchProvider>
     <View style={styles.container}>
       <Header />
 
@@ -33,6 +35,7 @@ export default function App() {
       </ActionSheetProvider>
 
     </View>
+    </SearchProvider>
 
   );
 }

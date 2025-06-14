@@ -21,14 +21,7 @@ export function AppRoutes() {
                 headerShown: false,
                 tabBarStyle: {
                     backgroundColor: '#6C5DD3',
-                    //borderTopLeftRadius: 24,
-                    //borderTopRightRadius: 24,
-                    //borderBottomRightRadius: 24,
-                    //borderBottomLeftRadius: 24,
-                    //height: 60,
-                    //paddingBottom: 6,
-                    //paddingTop: 6,
-                    //marginBottom: 20
+                    
                 },
                 tabBarActiveTintColor: '#fff',
                 tabBarInactiveTintColor: '#ccc',
@@ -54,10 +47,10 @@ export function AppRoutes() {
                         return <Feather name='archive' color={'white'} size={25} />
                     }
                 }}/>
-                <Screen name='Dashboard' component={NewProduct} 
+                <Screen name='Novo' component={NewProduct} 
                 options={{
                     tabBarIcon: () => {
-                        return <Feather name='bar-chart-2' color={'white'} size={25} />
+                        return <Feather name='edit' color={'white'} size={25} />
                     }
                 }}/>
             </Navigator>

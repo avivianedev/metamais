@@ -7,10 +7,10 @@ import { formatCurrencyInput } from "../../utils/formatCurrency";
 type typePropsModal = {
     onChange: (value: boolean) => void;
     value: boolean
-    childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number }[]>>;
+    childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number, produced : number }[]>>;
     title: string
     textBtn : string
-    initialChild?: { name: string; goal: number }; //
+    initialChild?: { name: string; goal: number, produced: number }; //
     
 };
 
@@ -18,12 +18,15 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, initialChi
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
     const [goalChildren, SetGoalChildren] = useState('')
+    const [producedChildren, setProducedChildren] = useState('')
+
 
     
     useEffect(() => {
         if (initialChild) {
             SetNameProductChildren(initialChild.name);
             SetGoalChildren(formatCurrencyInput(initialChild.goal)); 
+            setProducedChildren(formatCurrencyInput(initialChild.produced))
         }
     }, [initialChild]);
 
@@ -37,13 +40,17 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, initialChi
             }
             
             let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
+            let produced = parseFloat(producedChildren.replace(/\./g, '').replace(',', '.'))
+
             const listChildren = []
             listChildren.push(nameProductChildren)
-            listChildren.push(goal)           
+            listChildren.push(goal)    
+            listChildren.push(produced)         
 
             const newChild = {
                 name: nameProductChildren,
-                goal: goal
+                goal: goal, 
+                produced : produced
             }
 
             //SetNameProductChildren('')

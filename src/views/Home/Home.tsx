@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native
 import { useFonts } from "expo-font";
 import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import Card from '../../components/Card/Card';
-import { clearAllProducts, getData } from '../../controllers/productsController';
+import { clearAllProducts, getData, getItem } from '../../controllers/productsController';
 import { useCallback, useEffect, useState } from 'react';
 import { Product } from '../../models/Product';
 import { formatCurrency } from '../../utils/formatCurrency';
@@ -15,10 +15,9 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function Home() {
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [refreshList, setRefreshList] = useState(false);
 
-  console.log('Valor de produtos', products)
+
   //clearAllProducts()
 
   useFocusEffect(
@@ -32,10 +31,9 @@ export default function Home() {
 
       fetchData()
 
-    }, [])
+    }, [refreshList])
 
   )
-  console.log('Valor de data', ...products)
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -45,6 +43,9 @@ export default function Home() {
   if (!fontsLoaded) {
     return null
   }
+
+
+
 
   return (
     <View style={styles.container}>
@@ -61,22 +62,20 @@ export default function Home() {
 
         renderItem={({ item }) => (
           (
-            <TouchableOpacity onPress={() => {
-              setSelectedProduct(item);           
+            <TouchableOpacity >
 
-              //setShowEditModal(true);
-            }}>
-
-              
               <Card
                 isLarge={true}
                 title={item.name}
                 percent={item.percent}
                 value={formatCurrency(item.goal)}
-                missing={formatCurrency(item.remaining)}
+                missing={formatCurrency(item.goal)}
                 children={item.children}
+                id={item.id}
+                onUpdated={() => setRefreshList(prev => !prev)}
 
               />
+
             </TouchableOpacity>
           )
         )}

@@ -20,7 +20,7 @@ const NewProduct = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
     const [showModal, setShowModal] = useState(false)
-    const [data, setData] = useState<{ name: string; goal: number }[]>([]);
+    const [data, setData] = useState<{ name: string; goal: number, produced: number }[]>([]);
 
     const handleSubmit = async () => {
 

@@ -1,47 +1,62 @@
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState } from "react"
 import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
 import { Product } from "../../models/Product";
 import { getItem, storeData } from "../../controllers/productsController";
 import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
+import { useApp } from "../context/AppContext";
+
 
 
 type editProps = {
     onClose: () => void;
     data: any[]
+    title: string
+    titleHeaderChild: string
+    producedModal: boolean,
+
 
 }
 
-export const EditProductModal = ({ onClose, data }: editProps) => {
+export const EditProductModal = ({ onClose, data, title, titleHeaderChild, producedModal, }: editProps) => {
+
+    const { setRefreshList  } = useApp (); 
+
+    if (!data || data.length === 0 || !data[0]) {
+        return null;
+    }
 
     const [nameProduct, setNameProduct] = useState('')
     const [segment, setSegment] = useState('')
     const [goal, setGoal] = useState('')
-
+    const [produced, setProduced] = useState('')
     const [showEditChild, setShowEditChild] = useState(false)
     const [showListChild, setShowListChild] = useState(false)
-    const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
-
+    const [hasChildrenGoals, setHasChildrenGoals] = useState(data[0].hasChildren)
     const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
-    const [dataChild, setDataChild] = useState<{ name: string; goal: number }[]>([]);
-    
-    const handleUpdate = async () => {
+    const [dataChild, setDataChild] = useState<{ name: string; goal: number, produced: number }[]>([]);
+    const [updatedChildren, setUpdatedChildren] = useState(data[0].children);
+    const previousProduced = parseFloat(data[0].produced || 0);
+    const newProduced = parseFloat(produced.replace(/\./g, ''));
 
-        const sanitizedGoal = sanitizeCurrencyInput(goal);
+    const handleUpdate = async () => {
 
         const updatedChildren = data[0].children.map(
             (item: { name: string; goal: number }, index: number) =>
                 index === editingChildIndex ? dataChild[0] : item
-        );     
+        );
 
         const product: Product = {
             id: data[0].id,
             name: nameProduct,
             segment: segment,
-            goal: sanitizedGoal,
-            produced: 0,
+            goal: hasChildrenGoals
+                ? updatedChildren.reduce((acc: any, child: any) => acc + (child.goal || 0), 0)
+                : sanitizeCurrencyInput(goal),
+            produced: producedModal ? previousProduced + newProduced : newProduced,
             remaining: parseFloat(goal.replace(/\./g, '')),
             percent: 0,
             hasChildren: hasChildrenGoals,
@@ -54,12 +69,19 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
         if (result) {
             Alert.alert('Produto Alterado com sucesso!')
             onClose()
+            setRefreshList(prev => !prev); 
         }
 
     }
 
+
+
     const handleEditChild = (id: number) => {
-        console.log('Index a ser trabalhado:', id);
+        setShowEditChild(true)
+        setEditingChildIndex(id)
+    }
+
+    const handleAddPrd = (id: number) => {
         setShowEditChild(true)
         setEditingChildIndex(id)
 
@@ -67,30 +89,22 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
 
     useEffect(() => {
 
+
         if (editingChildIndex !== null) {
             setShowEditChild(true);
-            //console.log('Indice atualizado:', editingChildIndex)
         }
-        // if (dataChild.length > 0) {
-        //     console.log('Reconheco o valor true de data child.')
-        //     //const result = data[0].children.map((item: any, index: number) => index === 0 ? dataChild : item)
 
-        //     //console.log('Valor depois do MAP', result)
-        // } else {
-        //     console.log('NÂO Reconheco o valor true de data child')
-        // }
-
-
-        if (data && data.length > 0) {
+        if (data && data.length > 0 && data[0]) {
             setNameProduct(data[0].name);
             setSegment(data[0].segment);
             setGoal(formatCurrencyInput(data[0].goal));
-
+            setUpdatedChildren(data[0].children);
 
 
             if (data[0].children.length > 0) {
                 setShowListChild(true)
                 return
+
 
             } else {
                 //Alert.alert('Esse Produto não possui meta associada')
@@ -102,33 +116,48 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
 
     }, [data]);
 
+    useEffect(() => {
+        if (editingChildIndex !== null && dataChild[0]) {
+            const newList = updatedChildren.map((item: string, index: number) =>
+                index === editingChildIndex ? dataChild[0] : item
+            );
+            setUpdatedChildren(newList);
+
+            const totalChildrenGoals = newList.reduce((acc : any, child : any) => acc + (child.goal || 0), 0);
+            setGoal(formatCurrencyInput(totalChildrenGoals));
+        }
+    }, [dataChild]);
+
     return (
 
         <View style={styles.inputContainer}>
 
 
-            <Text style={styles.title}>Atualizar Produto</Text>
+            <Text style={styles.title}>{title}</Text>
 
             <TouchableOpacity style={styles.iConClose} accessibilityLabel="Fechar modal" onPress={onClose} >
                 <AntDesign name="close" size={24} color="white" />
             </TouchableOpacity>
-
+            <Text style={styles.inputLabel}>Nome do Produto</Text>
             <TextInput
                 placeholder="Nome do Produto"
                 value={nameProduct}
                 onChangeText={setNameProduct}
                 style={styles.input}
                 placeholderTextColor={'white'}
+                editable={producedModal ? false : true}
             />
-
+            <Text style={styles.inputLabel}>Nome do Segmento</Text>
             <TextInput
                 placeholder="Nome do Segmento"
                 value={segment}
                 onChangeText={setSegment}
                 style={styles.input}
                 placeholderTextColor={'white'}
+                editable={producedModal ? false : true}
 
             />
+            <Text style={styles.inputLabel}>Meta Final</Text>
 
             <TextInput
                 placeholder="Meta em R$"
@@ -136,19 +165,46 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                 onChangeText={setGoal}
                 style={styles.input}
                 placeholderTextColor={'white'}
+                editable={producedModal ? false : true}
+
             />
 
+            {!hasChildrenGoals && producedModal &&
+                <>
+                    <Text style={styles.inputLabel}>Nova Produção</Text>
+
+                    <TextInput
+                        placeholder="Valor em R$"
+                        value={produced}
+                        onChangeText={setProduced}
+                        style={styles.input}
+                        placeholderTextColor={'white'}
+                        editable={true}
+
+
+                    />
+                </>
+            }
 
             <TouchableOpacity style={styles.button} onPress={handleUpdate}>
                 <Text style={styles.buttonText}>Alterar</Text>
             </TouchableOpacity>
 
 
+
             {showListChild && (
 
                 <>
-                    {data[0].children.map((e: any, index: number) =>
+
+                    <View style={styles.containerTextHeader}>
+                        <Text style={styles.containerText}>Produto</Text>
+                        <Text style={styles.containerText}>{titleHeaderChild}</Text>
+                        <Text style={styles.containerText}>Ação</Text>
+                    </View>
+                    {updatedChildren.map((e: any, index: number) =>
+
                     (
+
                         <View key={index} style={styles.renderDataChildContent}>
 
                             <View style={styles.containerChild}>
@@ -156,16 +212,27 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                             </View>
 
                             <View style={styles.containerChildValue}>
-                                <Text style={styles.childText}>{formatCurrency(e.goal)}</Text>
-                                <View style={styles.boxIcons}>
-                                    <TouchableOpacity
-                                        onPress={() => handleEditChild(index)} >
-                                        <Feather name="edit" size={24} color="#FFCA3A" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity>
-                                        <Feather name="trash" size={24} color="#FF595E" />
-                                    </TouchableOpacity>
-                                </View>
+                                <Text style={styles.childText}>{producedModal ? formatCurrency(e.produced) : formatCurrency(e.goal)}</Text>
+                                {producedModal ?
+
+                                    <View style={styles.boxIcons}>
+                                        <TouchableOpacity
+                                            onPress={() => handleAddPrd(index)} >
+                                            <Ionicons name="add-circle-outline" size={24} color="#57C3FF" />
+                                        </TouchableOpacity>
+                                    </View>
+                                    :
+                                    <View style={styles.boxIcons}>
+                                        <TouchableOpacity
+                                            onPress={() => handleEditChild(index)} >
+                                            <Feather name="edit" size={20} color="#FFCA3A" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity>
+                                            <Feather name="trash" size={20} color="#FF595E" />
+                                        </TouchableOpacity>
+                                    </View>
+                                }
+
                             </View>
 
                         </View>
@@ -173,7 +240,7 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                     )
                     )}
 
-                    {editingChildIndex !== null && showEditChild &&(
+                    {editingChildIndex !== null && showEditChild && (
                         <View style={styles.editingChildContainer}>
                             <AddChildrenGoals
                                 value={true}
@@ -182,9 +249,13 @@ export const EditProductModal = ({ onClose, data }: editProps) => {
                                     setShowEditChild(!showEditChild)
                                     setShowListChild(showEditChild)
                                 }}
+                                hasChildrenGoals={hasChildrenGoals}
+                                producedModal={producedModal}
                                 title="Atualizar Metas Vinculadas"
-                                textBtn = 'Atualizar'
-                                initialChild={data[0].children[editingChildIndex]}
+                                textBtn='Atualizar'
+                                initialChild={data[0].children[editingChildIndex]
+
+                                }
                             />
                         </View>
                     )}
@@ -209,9 +280,22 @@ const styles = StyleSheet.create({
         padding: 24,
         alignItems: 'center',
         backgroundColor: '#6C5DD3',
-        gap: 24,
+        gap: 10,
         borderRadius: 15,
     },
+    containerTextHeader: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+
+    containerText: {
+        fontSize: 14,
+        fontWeight: 700,
+        fontFamily: 'Inter_400Regular',
+        color: '#343B4F',
+    },
+
     title: {
         fontSize: 18,
         fontFamily: 'Inter_400Regular',
@@ -229,6 +313,12 @@ const styles = StyleSheet.create({
         fontWeight: 700,
 
     },
+    inputLabel: {
+        alignSelf: 'flex-start',
+        fontFamily: 'Inter_400Regular',
+        paddingLeft: 10,
+        color: '#343B4F'
+    },
     button: {
         width: '70%',
         height: 48,
@@ -243,6 +333,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
 
     },
+
     buttonText: {
         color: '#fff',
         fontSize: 18,
@@ -265,35 +356,41 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        //alignItems: 'center',
 
 
     },
     childText: {
-        fontSize: 18,
+        fontSize: 14,
         fontFamily: 'Inter_400Regular',
         color: '#fff',
         fontWeight: 700
     },
     containerChild: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        position: 'relative'
+        //display: 'flex',
+        //flexDirection: 'row',
+        //alignItems: 'center',
+        width: '50%',
+        position: 'relative',
+        alignSelf: 'flex-start'
     },
 
     containerChildValue: {
+        width: '50%',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10
+        justifyContent: 'space-between',
+        //alignSelf: 'flex-end',
+        gap: 5
 
     },
     boxIcons: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 15
+        justifyContent: 'flex-end',
+        gap: 5
     },
     scrollChildrenContainer: {
         maxHeight: 225,
@@ -314,7 +411,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)', // se quiser um overlay escuro
+        backgroundColor: 'rgba(0,0,0,0.4)',
         zIndex: 99,
     }
 

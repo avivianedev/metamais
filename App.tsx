@@ -8,7 +8,7 @@ import Home from './src/views/Home/Home';
 import { AppRoutes } from './src/routes/app.routes';
 
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { SearchProvider } from './src/components/context/SearchContext';
+import { SearchProvider } from './src/components/context/AppContext';
 
 
 export default function App() {

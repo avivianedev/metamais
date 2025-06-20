@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Checkbox from "../../components/Checkbox/Checkbox";
 import uuid from 'react-native-uuid';
 import { Product } from "../../models/Product";
@@ -9,7 +9,7 @@ import { SucessMessage } from "../../components/Modal/SucessMessage";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { AddChildrenGoals } from "./AddChildrenGoals";
 import { FormProduct } from "../../components/FormProduct/FormProduct";
-import { formatCurrency } from "../../utils/formatCurrency";
+import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
 
 
 const NewProduct = () => {
@@ -22,32 +22,47 @@ const NewProduct = () => {
     const [showModal, setShowModal] = useState(false)
     const [data, setData] = useState<{ name: string; goal: number, produced: number }[]>([]);
 
-    const handleSubmit = async () => {
+    const clearForm = () => {
+        
+        setNameProduct('')
+        setSegment('')
+        setGoal('')
+        setHasChildrenGoals(false)
+        
+        setData([])
+    }
 
+    const handleSubmit = async () => {
+        
         const product: Product = {
             id: uuid.v4(),
             name: nameProduct,
             segment: segment,
-            goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
+            //goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
+            goal: sanitizeCurrencyInput(goal),
             produced: 0,
-            remaining: parseFloat(goal.replace(/\./g, '')),
+            //remaining: parseFloat(goal.replace(/\./g, '')),
+            remaining: sanitizeCurrencyInput(goal),
             percent: 0,
             hasChildren: hasChildrenGoals,
             children: data
         };
-        
+
         const result = await storeData(product);
 
         if (result) {
+            clearForm()
             setModalVisible(true);
-            setNameProduct('')
-            setSegment('')
-            setGoal('')
-            setHasChildrenGoals(false)
-            setShowModal(false)
-            setData([])
+            setShowModal(false)            
         }
     };
+
+    useEffect(() => {
+        if (data.length > 0) {
+            const total = data.reduce((acc, item) => acc + item.goal, 0 );
+            setGoal(formatCurrencyInput(total))
+        }
+    }, [data]);
 
     return (
         <View style={styles.container}>
@@ -60,6 +75,7 @@ const NewProduct = () => {
                 setSegment={setSegment}
                 goal={goal}
                 setGoal={setGoal}
+                hasChildrenGoals={hasChildrenGoals}
             />
 
             <SucessMessage
@@ -92,9 +108,9 @@ const NewProduct = () => {
                 value={showModal}
                 childData={setData}
                 title="Cadastrar Meta Vinculada"
-                initialChild={data[0]} // ou qualquer item da lista
-                //editingIndex={index} // se quiser editar no array
+                hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
+                producedModal={false}
             />
 
             }
@@ -103,24 +119,25 @@ const NewProduct = () => {
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContainer}
                 keyboardShouldPersistTaps="handled"
+
             >
-               
+
 
                 {data.length > 0 && (
-                <View style={styles.renderDataChildContainer}>
-                    {data.map((e, index: number) => (
-                        <View key={index} style={styles.renderDataChildContent}>
-                            <Text>{e.name}</Text>
-                            <Text>{formatCurrency(e.goal)}</Text>
-                        </View>
+                    <View style={styles.renderDataChildContainer}>
+                        {data.map((e, index: number) => (
+                            <View key={index} style={styles.renderDataChildContent}>
+                                <Text>{e.name}</Text>
+                                <Text>{formatCurrency(e.goal)}</Text>
+                            </View>
 
-                    ))}
+                        ))}
 
-                </View>
-            )}
+                    </View>
+                )}
             </ScrollView>
 
-            
+
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Cadastrar</Text>

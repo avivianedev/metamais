@@ -9,6 +9,7 @@ type FormProductProps = {
     setSegment: (value: string) => void;
     goal: string;
     setGoal: (value: string) => void;
+    hasChildrenGoals: boolean
 };
 
 export const FormProduct = ({
@@ -19,6 +20,7 @@ export const FormProduct = ({
     setSegment,
     goal,
     setGoal,
+    hasChildrenGoals,
 } : FormProductProps
     
 ) => {    
@@ -50,7 +52,8 @@ export const FormProduct = ({
                 onChangeText={setGoal}
                 style={styles.input}
                 placeholderTextColor={'black'}
-                keyboardType="numeric"
+                editable={!hasChildrenGoals}
+                //keyboardType="numeric"
             />
         </View>
     )

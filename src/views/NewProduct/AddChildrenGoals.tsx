@@ -7,65 +7,88 @@ import { formatCurrencyInput } from "../../utils/formatCurrency";
 type typePropsModal = {
     onChange: (value: boolean) => void;
     value: boolean
-    childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number, produced : number }[]>>;
+    childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number, produced: number }[]>>;
     title: string
-    textBtn : string
-    initialChild?: { name: string; goal: number, produced: number }; //
-    
+    textBtn: string
+    initialChild?: { name: string; goal: number, produced: number };
+    producedModal: boolean,
+    hasChildrenGoals: boolean
 };
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, initialChild, textBtn }: typePropsModal) => {
+
+
+export const AddChildrenGoals = ({ onChange, value, childData, title, initialChild, textBtn, producedModal, hasChildrenGoals }: typePropsModal) => {
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
     const [goalChildren, SetGoalChildren] = useState('')
     const [producedChildren, setProducedChildren] = useState('')
+    const [newProduction, setNewProduction] = useState('')   
+
+    const handleChangeInput = (text: string) => {
+        if (producedModal) {
+            setProducedChildren(text);
+            setNewProduction(text)
+        } else {
+            SetGoalChildren(text);
+
+        }
+    };
 
 
-    
     useEffect(() => {
+
         if (initialChild) {
             SetNameProductChildren(initialChild.name);
-            SetGoalChildren(formatCurrencyInput(initialChild.goal)); 
-            setProducedChildren(formatCurrencyInput(initialChild.produced))
+            SetGoalChildren(formatCurrencyInput(initialChild.goal));
+            if (initialChild.produced !== null) {
+                setProducedChildren(formatCurrencyInput(initialChild.produced))
+            }
+
+
         }
     }, [initialChild]);
+
+
 
     const ListChildren = () => {
 
         try {
+            //const listChildren = []
 
             if (!nameProductChildren.trim() || !goalChildren.trim()) {
                 Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
                 return false
+
             }
-            
+
             let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
             let produced = parseFloat(producedChildren.replace(/\./g, '').replace(',', '.'))
+            let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))
+            
 
-            const listChildren = []
-            listChildren.push(nameProductChildren)
-            listChildren.push(goal)    
-            listChildren.push(produced)         
+            const previousProduced = initialChild?.produced || 0;
+            const childProduced = previousProduced + newProducedValue;
+
+            //listChildren.push(nameProductChildren)
+            //listChildren.push(goal)    
+            //listChildren.push(goal)               
 
             const newChild = {
                 name: nameProductChildren,
-                goal: goal, 
-                produced : produced
+                goal: goal,
+                produced: childProduced
             }
 
-            //SetNameProductChildren('')
-            //SetGoalChildren('')
             childData(prev => [...prev, newChild])
+            //setTotalProduced(prev => prev + childProduced)
             Alert.alert('Produto Adicionado')
             onChange(false)
 
-            //console.log('Retorno ao clicar no Modal de ADD tarefas adicionar', newChild)
             return newChild
 
         } catch (error) {
             console.log('Erro ao adicionar meta vinculada')
         }
-
 
 
     }
@@ -85,15 +108,21 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, initialChi
                 onChangeText={test => SetNameProductChildren(test)}
                 style={styles.input}
                 placeholderTextColor={'white'}
+                focusable={true}
+                cursorColor={'white'}
+                editable={producedModal ? false : true}
             />
 
             <TextInput
-                placeholder="Meta em R$"
-                value={goalChildren}
-                onChangeText={test => SetGoalChildren(test)}
+                placeholder={producedModal ? 'Nova Produção em R$' : 'Meta em R$'}
+                value={producedModal ? newProduction : goalChildren}
+                onChangeText={handleChangeInput}
                 style={styles.input}
                 placeholderTextColor={'white'}
-                keyboardType="numeric"
+                //keyboardType="numeric"
+                focusable={true}
+                cursorColor={'white'}
+
             />
 
             <TouchableOpacity style={styles.button} onPress={() => ListChildren()}>
@@ -120,7 +149,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#6C5DD3',
         position: 'absolute',
         top: '15%',
-        zIndex: 2,
+        color: 'white',
+        zIndex: 5
 
     },
     title: {
@@ -135,11 +165,14 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 2,
         borderRadius: 10,
-        alignItems: 'center',
+        //alignItems: 'center',
         paddingLeft: 10,
-        height: 38,
+        height: 44,
         fontWeight: '500',
-        color: 'white'
+        color: 'white',
+        //backgroundColor: 'transparent',
+        zIndex: 5,
+
 
     },
     button: {
@@ -153,7 +186,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 20
+        marginTop: 20,
     },
     buttonText: {
         color: '#fff',

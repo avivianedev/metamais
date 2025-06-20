@@ -3,9 +3,10 @@ import { Product } from "../models/Product";
 import { Alert } from "react-native";
 
 
-export const storeData = async (product: Product): Promise<boolean> => {    
+export const storeData = async (product: Product): Promise<boolean> => {  
 
-    try {
+
+    try {        
 
         if (!product.name.trim() || !product.segment.trim() || !product.goal) {
             Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');

@@ -5,12 +5,12 @@ const { Navigator, Screen } = createBottomTabNavigator();
 
 import Home from '../views/Home/Home';
 import NewProduct from '../views/NewProduct/NewProduct';
-import NewProduction from '../views/NewProduction/NewProduction';
 import History from '../views/History/History';
 import { StyleSheet, View } from 'react-native';
 
 import { Feather } from '@expo/vector-icons'
 import Entypo from '@expo/vector-icons/Entypo';
+import Settings from '../views/Settings/Settings';
 
 
 export function AppRoutes() {
@@ -36,23 +36,25 @@ export function AppRoutes() {
                     }                        
                             
                 }} />
-                <Screen name='Produção' component={NewProduction} options={{
-                    tabBarIcon: () => {
-                        return <Feather name='plus-circle' color={'white'} size={25} />
-                    }
-                }}/>
-                <Screen name='Histórico' component={History} 
-                options={{
-                    tabBarIcon: () => {
-                        return <Feather name='archive' color={'white'} size={25} />
-                    }
-                }}/>
                 <Screen name='Novo' component={NewProduct} 
                 options={{
                     tabBarIcon: () => {
                         return <Feather name='edit' color={'white'} size={25} />
                     }
                 }}/>
+                
+                <Screen name='Histórico' component={History} 
+                options={{
+                    tabBarIcon: () => {
+                        return <Feather name='archive' color={'white'} size={25} />
+                    }
+                }}/>
+                <Screen name='Configuração' component={Settings} options={{
+                    tabBarIcon: () => {
+                        return <Feather name="settings" size={24} color={'white'} />
+                    }
+                }}/>
+                
             </Navigator>
         </NavigationContainer>
 

@@ -8,16 +8,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { Product } from '../../models/Product';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useFocusEffect } from '@react-navigation/native';
-import { useSearch } from '../../components/context/SearchContext';
+import { useApp } from '../../components/context/AppContext';
 
 
 export default function Home() {
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [refreshList, setRefreshList] = useState(false);
+  //const [refreshList, setRefreshList] = useState(false);
 
-  const { search } = useSearch();
-  console.log("input na Home", search)
+  const { search, refreshList  } = useApp (); 
 
 
   const searchResult = search ? products.filter(item => {
@@ -25,12 +24,7 @@ export default function Home() {
       item.children?.[0]?.name.toLowerCase().includes(search.toLowerCase())
   }
 
-  ) : products
-
-
-  
-  console.log('Retorno do FIltro', searchResult)
-  //clearAllProducts()
+  ) : products   
 
   useFocusEffect(
     useCallback(() => {
@@ -71,25 +65,28 @@ export default function Home() {
           paddingHorizontal: 16,
           paddingTop: 16,
         }}
-
+        
         renderItem={({ item }) => (
           (
             <TouchableOpacity >
-
-              <Card
+              
+              <Card              
                 isLarge={true}
                 title={item.name}
                 percent={item.percent}
-                value={formatCurrency(item.goal)}
+                goal={item.goal}
                 missing={formatCurrency(item.goal)}
+                produced={item.produced}
                 children={item.children}
                 id={item.id}
-                onUpdated={() => setRefreshList(prev => !prev)}
+                //onUpdated={() => setRefreshList(prev => !prev)}
+                
 
               />
 
             </TouchableOpacity>
-          )
+            
+          )          
         )}
       />
 
@@ -101,7 +98,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9F9', // ou o tom que você quiser   
+    backgroundColor: '#F9F9F9',   
     padding: 24,
     gap: 24,
     width: '100%',

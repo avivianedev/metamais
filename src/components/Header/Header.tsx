@@ -4,13 +4,13 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from "react";
-import { useSearch } from "../context/SearchContext";
+import { useApp } from "../context/AppContext";
 
 
 
 const Header = () => {
 
-    const { search, setSearch } = useSearch();
+    const { search, setSearch } = useApp();
 
     //console.log('Valor do inputSearch', search)
 

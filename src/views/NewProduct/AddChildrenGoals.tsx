@@ -10,14 +10,14 @@ type typePropsModal = {
     childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number, produced: number }[]>>;
     title: string
     textBtn: string
-    initialChild?: { name: string; goal: number, produced: number };
+    selectedChildGoal?: { name: string; goal: number, produced: number };
     producedModal: boolean,
     hasChildrenGoals: boolean
 };
 
 
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, initialChild, textBtn, producedModal, hasChildrenGoals }: typePropsModal) => {
+export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, hasChildrenGoals }: typePropsModal) => {
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
     const [goalChildren, SetGoalChildren] = useState('')
@@ -34,26 +34,28 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, initialChi
         }
     };
 
+    console.log(`Valor de selectedChildGoal ${selectedChildGoal?.goal}`)
 
     useEffect(() => {
 
-        if (initialChild) {
-            SetNameProductChildren(initialChild.name);
-            SetGoalChildren(formatCurrencyInput(initialChild.goal));
-            if (initialChild.produced !== null) {
-                setProducedChildren(formatCurrencyInput(initialChild.produced))
+        if (selectedChildGoal) {
+            
+            SetNameProductChildren(selectedChildGoal.name);
+            SetGoalChildren(formatCurrencyInput(selectedChildGoal.goal));
+            if (selectedChildGoal.produced !== null) {
+                setProducedChildren(formatCurrencyInput(selectedChildGoal.produced))
             }
 
-
+           
         }
-    }, [initialChild]);
+    }, [selectedChildGoal]);
 
-
+   
 
     const ListChildren = () => {
 
         try {
-            //const listChildren = []
+            
 
             if (!nameProductChildren.trim() || !goalChildren.trim()) {
                 Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
@@ -63,24 +65,18 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, initialChi
 
             let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
             let produced = parseFloat(producedChildren.replace(/\./g, '').replace(',', '.'))
-            let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))
-            
-
-            const previousProduced = initialChild?.produced || 0;
-            const childProduced = previousProduced + newProducedValue;
-
-            //listChildren.push(nameProductChildren)
-            //listChildren.push(goal)    
-            //listChildren.push(goal)               
+            let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))         
+            const previousProduced = selectedChildGoal?.produced || 0;
+            const childProduced = previousProduced + newProducedValue;           
 
             const newChild = {
                 name: nameProductChildren,
                 goal: goal,
-                produced: childProduced
+                produced: producedModal ? childProduced : produced
             }
 
             childData(prev => [...prev, newChild])
-            //setTotalProduced(prev => prev + childProduced)
+        
             Alert.alert('Produto Adicionado')
             onChange(false)
 

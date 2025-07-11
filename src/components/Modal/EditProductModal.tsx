@@ -10,37 +10,36 @@ import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
 import { useApp } from "../context/AppContext";
 
 
-
 type editProps = {
     onClose: () => void;
     data: any[]
     title: string
     titleHeaderChild: string
     producedModal: boolean,
-
-
 }
 
 export const EditProductModal = ({ onClose, data, title, titleHeaderChild, producedModal, }: editProps) => {
 
-    const { setRefreshList  } = useApp (); 
+    const { setRefreshList } = useApp();
 
     if (!data || data.length === 0 || !data[0]) {
         return null;
     }
 
-    const [nameProduct, setNameProduct] = useState('')
+    const [parentName, setParentName] = useState('')
     const [segment, setSegment] = useState('')
-    const [goal, setGoal] = useState('')
-    const [produced, setProduced] = useState('')
-    const [showEditChild, setShowEditChild] = useState(false)
-    const [showListChild, setShowListChild] = useState(false)
+    const [parentGoal, setParentGoal] = useState('')
+    const [paretProduced, setParentProduced] = useState('')
+
+    const [showChildGoalModal, setShowChildGoalModal] = useState(false)
+    //const [hasSavedChildGoals, setHasSavedChildGoals] = useState(false)
+
     const [hasChildrenGoals, setHasChildrenGoals] = useState(data[0].hasChildren)
     const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
     const [dataChild, setDataChild] = useState<{ name: string; goal: number, produced: number }[]>([]);
     const [updatedChildren, setUpdatedChildren] = useState(data[0].children);
     const previousProduced = parseFloat(data[0].produced || 0);
-    const newProduced = parseFloat(produced.replace(/\./g, ''));
+    const newProduced = parseFloat(paretProduced.replace(/\./g, ''));
 
     const handleUpdate = async () => {
 
@@ -51,13 +50,13 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
         const product: Product = {
             id: data[0].id,
-            name: nameProduct,
+            name: parentName,
             segment: segment,
             goal: hasChildrenGoals
                 ? updatedChildren.reduce((acc: any, child: any) => acc + (child.goal || 0), 0)
-                : sanitizeCurrencyInput(goal),
+                : sanitizeCurrencyInput(parentGoal),
             produced: producedModal ? previousProduced + newProduced : newProduced,
-            remaining: parseFloat(goal.replace(/\./g, '')),
+            remaining: parseFloat(parentGoal.replace(/\./g, '')),
             percent: 0,
             hasChildren: hasChildrenGoals,
             children: updatedChildren
@@ -69,46 +68,43 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
         if (result) {
             Alert.alert('Produto Alterado com sucesso!')
             onClose()
-            setRefreshList(prev => !prev); 
+            setRefreshList(prev => !prev);
         }
 
     }
 
 
 
-    const handleEditChild = (id: number) => {
-        setShowEditChild(true)
-        setEditingChildIndex(id)
-    }
-
-    const handleAddPrd = (id: number) => {
-        setShowEditChild(true)
-        setEditingChildIndex(id)
-
-    }
+    const openChildGoalForm = (id: number, type: 'edit' | 'production') => {
+        if (type === 'edit') {
+            setShowChildGoalModal(true)
+            setEditingChildIndex(id)
+        }else{
+            setShowChildGoalModal(true)
+            setEditingChildIndex(id)
+        }
+    }  
 
     useEffect(() => {
 
 
         if (editingChildIndex !== null) {
-            setShowEditChild(true);
+            setShowChildGoalModal(true);
         }
 
         if (data && data.length > 0 && data[0]) {
-            setNameProduct(data[0].name);
+            setParentName(data[0].name);
             setSegment(data[0].segment);
-            setGoal(formatCurrencyInput(data[0].goal));
+            setParentGoal(formatCurrencyInput(data[0].goal));
             setUpdatedChildren(data[0].children);
 
 
-            if (data[0].children.length > 0) {
-                setShowListChild(true)
+            if (!hasChildrenGoals) {
+                setShowChildGoalModal(true)
                 return
 
 
             } else {
-                //Alert.alert('Esse Produto não possui meta associada')
-                setShowEditChild(false)
                 return
             }
 
@@ -123,8 +119,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             );
             setUpdatedChildren(newList);
 
-            const totalChildrenGoals = newList.reduce((acc : any, child : any) => acc + (child.goal || 0), 0);
-            setGoal(formatCurrencyInput(totalChildrenGoals));
+            const totalChildrenGoals = newList.reduce((acc: any, child: any) => acc + (child.goal || 0), 0);
+            setParentGoal(formatCurrencyInput(totalChildrenGoals));
         }
     }, [dataChild]);
 
@@ -141,8 +137,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             <Text style={styles.inputLabel}>Nome do Produto</Text>
             <TextInput
                 placeholder="Nome do Produto"
-                value={nameProduct}
-                onChangeText={setNameProduct}
+                value={parentName}
+                onChangeText={setParentName}
                 style={styles.input}
                 placeholderTextColor={'white'}
                 editable={producedModal ? false : true}
@@ -161,8 +157,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
             <TextInput
                 placeholder="Meta em R$"
-                value={goal}
-                onChangeText={setGoal}
+                value={parentGoal}
+                onChangeText={setParentGoal}
                 style={styles.input}
                 placeholderTextColor={'white'}
                 editable={producedModal ? false : true}
@@ -175,8 +171,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
                     <TextInput
                         placeholder="Valor em R$"
-                        value={produced}
-                        onChangeText={setProduced}
+                        value={paretProduced}
+                        onChangeText={setParentProduced}
                         style={styles.input}
                         placeholderTextColor={'white'}
                         editable={true}
@@ -192,7 +188,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
 
 
-            {showListChild && (
+            {hasChildrenGoals && (
 
                 <>
 
@@ -217,14 +213,14 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
                                     <View style={styles.boxIcons}>
                                         <TouchableOpacity
-                                            onPress={() => handleAddPrd(index)} >
+                                            onPress={() => openChildGoalForm(index, 'production')} >
                                             <Ionicons name="add-circle-outline" size={24} color="#57C3FF" />
                                         </TouchableOpacity>
                                     </View>
                                     :
                                     <View style={styles.boxIcons}>
                                         <TouchableOpacity
-                                            onPress={() => handleEditChild(index)} >
+                                            onPress={() => openChildGoalForm(index, 'edit')} >
                                             <Feather name="edit" size={20} color="#FFCA3A" />
                                         </TouchableOpacity>
                                         <TouchableOpacity>
@@ -240,20 +236,20 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                     )
                     )}
 
-                    {editingChildIndex !== null && showEditChild && (
+                    {editingChildIndex !== null && showChildGoalModal && (
                         <View style={styles.editingChildContainer}>
                             <AddChildrenGoals
                                 value={true}
                                 childData={setDataChild}
                                 onChange={() => {
-                                    setShowEditChild(!showEditChild)
-                                    setShowListChild(showEditChild)
+                                    setShowChildGoalModal(!showChildGoalModal)
+                                    //setHasSavedChildGoals(showEditChild)
                                 }}
                                 hasChildrenGoals={hasChildrenGoals}
                                 producedModal={producedModal}
                                 title="Atualizar Metas Vinculadas"
                                 textBtn='Atualizar'
-                                initialChild={data[0].children[editingChildIndex]
+                                selectedChildGoal={data[0].children[editingChildIndex]
 
                                 }
                             />

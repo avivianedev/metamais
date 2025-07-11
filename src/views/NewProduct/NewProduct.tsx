@@ -14,74 +14,75 @@ import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../.
 
 const NewProduct = () => {
 
-    const [nameProduct, setNameProduct] = useState('')
+    const [parentName, setParentName] = useState('')
     const [segment, setSegment] = useState('')
-    const [goal, setGoal] = useState('')
-    const [modalVisible, setModalVisible] = useState(false);
+    const [parentGoal, setParentGoal] = useState('')
+    const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
-    const [showModal, setShowModal] = useState(false)
-    const [data, setData] = useState<{ name: string; goal: number, produced: number }[]>([]);
+    const [showChildModal, setShowChildModal] = useState(false)
+    const [dataChildGoals, setDataChildGoals] = useState<{ name: string; goal: number, produced: number }[]>([]);
+
+    
 
     const clearForm = () => {
-        
-        setNameProduct('')
+
+        setParentName('')
         setSegment('')
-        setGoal('')
+        setParentGoal('')
         setHasChildrenGoals(false)
-        
-        setData([])
+        setDataChildGoals([])
     }
 
     const handleSubmit = async () => {
-        
+
         const product: Product = {
             id: uuid.v4(),
-            name: nameProduct,
+            name: parentName,
             segment: segment,
             //goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
-            goal: sanitizeCurrencyInput(goal),
+            goal: sanitizeCurrencyInput(parentGoal),
             produced: 0,
             //remaining: parseFloat(goal.replace(/\./g, '')),
-            remaining: sanitizeCurrencyInput(goal),
+            remaining: sanitizeCurrencyInput(parentGoal),
             percent: 0,
             hasChildren: hasChildrenGoals,
-            children: data
+            children: dataChildGoals
         };
 
         const result = await storeData(product);
 
         if (result) {
             clearForm()
-            setModalVisible(true);
-            setShowModal(false)            
+            setSuccessModalVisible(true);
+            setShowChildModal(false)
         }
     };
 
     useEffect(() => {
-        if (data.length > 0) {
-            const total = data.reduce((acc, item) => acc + item.goal, 0 );
-            setGoal(formatCurrencyInput(total))
+        if (dataChildGoals.length > 0) {
+            const total = dataChildGoals.reduce((acc, item) => acc + item.goal, 0);
+            setParentGoal(formatCurrencyInput(total))
         }
-    }, [data]);
+    }, [dataChildGoals]);
 
     return (
         <View style={styles.container}>
 
             <FormProduct
                 title={'Cadastro de Produtos'}
-                nameProduct={nameProduct}
-                setNameProduct={setNameProduct}
+                nameProduct={parentName}
+                setNameProduct={setParentName}
                 segment={segment}
                 setSegment={setSegment}
-                goal={goal}
-                setGoal={setGoal}
+                goal={parentGoal}
+                setGoal={setParentGoal}
                 hasChildrenGoals={hasChildrenGoals}
             />
 
             <SucessMessage
                 texto="Cadastro realizado com sucesso!"
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
+                visible={successModalVisible}
+                onClose={() => setSuccessModalVisible(false)}
             />
 
 
@@ -97,16 +98,16 @@ const NewProduct = () => {
             {hasChildrenGoals &&
 
                 <View style={styles.childrenGoals}>
-                    <TouchableOpacity onPress={() => setShowModal(!showModal)}>
+                    <TouchableOpacity onPress={() => setShowChildModal(!showChildModal)}>
                         <AntDesign name="pluscircleo" size={18} color="#3D3D3D" />
                     </TouchableOpacity>
                     <Text style={styles.TextchildrenGoals}>Adicionar a meta vinculada</Text>
                 </View>}
 
-            {showModal && <AddChildrenGoals
-                onChange={setShowModal}
-                value={showModal}
-                childData={setData}
+            {showChildModal && <AddChildrenGoals
+                onChange={setShowChildModal}
+                value={showChildModal}
+                childData={setDataChildGoals}
                 title="Cadastrar Meta Vinculada"
                 hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
@@ -123,9 +124,9 @@ const NewProduct = () => {
             >
 
 
-                {data.length > 0 && (
+                {dataChildGoals.length > 0 && (
                     <View style={styles.renderDataChildContainer}>
-                        {data.map((e, index: number) => (
+                        {dataChildGoals.map((e, index: number) => (
                             <View key={index} style={styles.renderDataChildContent}>
                                 <Text>{e.name}</Text>
                                 <Text>{formatCurrency(e.goal)}</Text>
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
         height: 48,
         borderWidth: 1,
         borderRadius: 10,
-        backgroundColor: '#8E7EFF',
+        backgroundColor: '#6C5DD3',
         borderColor: '#fff',
         display: 'flex',
         flexDirection: 'row',
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
         padding: 2
     }, scrollContainer: {
         padding: 20,
-        paddingBottom: 60, // ou mais, pra garantir espaço abaixo do botão
+        paddingBottom: 60, 
     }
 })
 

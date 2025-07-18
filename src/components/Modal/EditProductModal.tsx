@@ -21,7 +21,6 @@ type editProps = {
 export const EditProductModal = ({ onClose, data, title, titleHeaderChild, producedModal, }: editProps) => {
 
     const { setRefreshList } = useApp();
-
     if (!data || data.length === 0 || !data[0]) {
         return null;
     }
@@ -32,21 +31,20 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
     const [paretProduced, setParentProduced] = useState('')
 
     const [showChildGoalModal, setShowChildGoalModal] = useState(false)
-    //const [hasSavedChildGoals, setHasSavedChildGoals] = useState(false)
 
     const [hasChildrenGoals, setHasChildrenGoals] = useState(data[0].hasChildren)
     const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
-    const [dataChild, setDataChild] = useState<{ name: string; goal: number, produced: number }[]>([]);
+    const [dataChild, setDataChild] = useState<{ key: string, name: string; goal: number, produced: number }[]>([]);
     const [updatedChildren, setUpdatedChildren] = useState(data[0].children);
     const previousProduced = parseFloat(data[0].produced || 0);
     const newProduced = parseFloat(paretProduced.replace(/\./g, ''));
 
     const handleUpdate = async () => {
 
-        const updatedChildren = data[0].children.map(
-            (item: { name: string; goal: number }, index: number) =>
-                index === editingChildIndex ? dataChild[0] : item
-        );
+        // const updatedChildren = data[0].children.map(
+        //     (item: { name: string; goal: number }, index: number) =>
+        //         index === editingChildIndex ? dataChild[0] : item
+        // );
 
         const product: Product = {
             id: data[0].id,
@@ -79,11 +77,11 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
         if (type === 'edit') {
             setShowChildGoalModal(true)
             setEditingChildIndex(id)
-        }else{
+        } else {
             setShowChildGoalModal(true)
             setEditingChildIndex(id)
         }
-    }  
+    }
 
     useEffect(() => {
 
@@ -113,16 +111,30 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
     }, [data]);
 
     useEffect(() => {
-        if (editingChildIndex !== null && dataChild[0]) {
-            const newList = updatedChildren.map((item: string, index: number) =>
-                index === editingChildIndex ? dataChild[0] : item
-            );
-            setUpdatedChildren(newList);
+        if (dataChild.length > 0) {
+            const updatedList = [...updatedChildren];
 
-            const totalChildrenGoals = newList.reduce((acc: any, child: any) => acc + (child.goal || 0), 0);
+            // Substitui ou atualiza os filhos com base na chave
+            dataChild.forEach((newChild) => {
+                const indexToUpdate = updatedList.findIndex(item => item.key === newChild.key);
+
+                if (indexToUpdate !== -1) {
+                    updatedList[indexToUpdate] = {
+                        ...updatedList[indexToUpdate],
+                        ...newChild,
+                    };
+                } else {
+                    // Caso esteja adicionando uma nova meta filha
+                    updatedList.push(newChild);
+                }
+            });
+
+            setUpdatedChildren(updatedList);
+
+            const totalChildrenGoals = updatedList.reduce((acc, child) => acc + (child.goal || 0), 0);
             setParentGoal(formatCurrencyInput(totalChildrenGoals));
         }
-    }, [dataChild]);
+    }, [dataChild])  
 
     return (
 
@@ -249,9 +261,11 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                                 producedModal={producedModal}
                                 title="Atualizar Metas Vinculadas"
                                 textBtn='Atualizar'
-                                selectedChildGoal={data[0].children[editingChildIndex]
+                                selectedChildGoal={data[0].children[editingChildIndex]}
+                                editingChildIndex={editingChildIndex}
 
-                                }
+
+
                             />
                         </View>
                     )}

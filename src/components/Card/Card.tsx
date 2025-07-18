@@ -9,7 +9,8 @@ import { EditProductModal } from "../Modal/EditProductModal";
 import { getItem } from "../../controllers/productsController";
 import { Product } from "../../models/Product";
 import { calculateMissing, calculatePercentage } from "../../utils/metricsUtils";
-import { useApp  } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
+import Feather from '@expo/vector-icons/Feather';
 
 
 
@@ -19,13 +20,12 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
     const { showActionSheetWithOptions } = useActionSheet();
     const [showEditModal, setShowEditModal] = useState(false)
     const [dataRecoverer, setDataRecoverer] = useState<any | null>(null)
-    const [showNewProductionModal, setShowNewProductionModal] = useState(false)
-
-    //const {setRefreshList } = useApp();
+    const [showNewProductionModal, setShowNewProductionModal] = useState(false)    
 
     let producedFormater = parseFloat(produced)
     let valueFormater = parseFloat(goal)
 
+    
     const handleGetItem = async (id: string, type: 'edit' | 'production') => {
         const selectedProduct = await getItem(id)
         setDataRecoverer(selectedProduct)
@@ -82,7 +82,7 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                     title='Atualizar Produto'
                     titleHeaderChild="Meta Final"
                     producedModal={false}
-                    
+
 
                 />
             </Modal>
@@ -112,14 +112,16 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
             >
                 <View style={styles.cardHeader}>
                     <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.title}>% {children?.length 
-                    ? calculatePercentage(children, goal, children) 
-                    : calculatePercentage(producedFormater, valueFormater) }</Text>
+                    <Text style={styles.title}>% {children?.length
+                        ? calculatePercentage(children, goal, children)
+                        : calculatePercentage(producedFormater, valueFormater)}</Text>
                 </View>
-                <Text style={styles.missing}>Falta: {
-                    children?.length
-                        ? formatCurrencyInput(calculateMissing(children, goal, children))
-                        : formatCurrencyInput(calculateMissing(producedFormater, valueFormater))}</Text>
+                <Text style={styles.missing}>
+                    Falta: {
+                        children?.length
+                            ? formatCurrencyInput(calculateMissing(children, goal, children).missing)
+                            : formatCurrencyInput(calculateMissing(producedFormater, valueFormater).missing)
+                    }</Text>
                 <Text style={styles.value}>Meta: {formatCurrencyInput(goal)}
 
                 </Text>
@@ -137,17 +139,26 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                                 <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
 
                                 {children.map((child: { name: string, goal: number, produced: number }, index: number) => (
-                                    <View style={styles.childContent} key={index}>
 
+                                    
+                                    <View style={styles.childContent} key={index}>
+                                        
                                         <View style={styles.childValues} key={index}>
                                             <Text style={styles.childName}>{child.name}</Text>
+                                            
                                             <Text style={styles.produced}>Prod: {formatCurrency(child.produced)}</Text>
+                                            
 
 
                                         </View>
                                         <View style={styles.producedValues}>
-                                            <Text style={styles.childMissing}>Falta: {formatCurrencyInput(calculateMissing(child.produced, child.goal))}</Text>
-                                            <Text style={styles.childPercent}>{calculatePercentage(child.produced, child.goal)} %</Text>
+                                            <Text style={styles.childMissing}>Falta: {formatCurrencyInput(calculateMissing(child.produced, child.goal).missing)}</Text>
+                                            <View style={styles.metaStatusView}>
+                                                <Text style={styles.childPercent}>{calculatePercentage(child.produced, child.goal)} %</Text>
+                                                {child.produced >= child.goal && ( <Feather name="check" size={18} color="#007200" />)} 
+                                               
+                                            </View>
+                                            
 
                                         </View>
                                     </View>
@@ -240,6 +251,8 @@ const styles = StyleSheet.create({
         borderColor: '#6c72FF',
         borderRadius: 10,
         padding: 10,
+        
+        
         //backgroundColor: '#D7C7FF'
     },
     childValues: {
@@ -247,6 +260,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center'
 
     },
     childName: {
@@ -272,6 +286,10 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'Inter_400Regular',
         color: '#101935'
+    },
+    metaStatusView: {
+        flexDirection: 'row',
+        alignItems : 'center'
     },
     producedValues: {
         display: 'flex',

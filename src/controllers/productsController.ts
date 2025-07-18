@@ -13,6 +13,7 @@ export const storeData = async (product: Product): Promise<boolean> => {
             return false
         }        
 
+        if(!product.produced) null
         const jsonValue = JSON.stringify(product);
         console.log('Valor no storeData,' , jsonValue)
         await AsyncStorage.setItem(`product-${product.id}`, jsonValue);
@@ -26,14 +27,6 @@ export const storeData = async (product: Product): Promise<boolean> => {
     }
 };
 
-//export const storeListChildren = (product: string, goal: number) => {
-//    const listChildren = []
-//    listChildren.push(product)
-//    listChildren.push(goal)
-//
-//    return listChildren
-//
-//}
 
 export const getData = async () => {
     try {
@@ -64,6 +57,7 @@ export const getItem = async (key: string) => {
             return products
 
         } else {
+            Alert.alert('Erro ao carregar dados')
             console.log('O id não foi localizado')
         }
 

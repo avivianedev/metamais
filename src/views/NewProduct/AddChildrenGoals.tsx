@@ -2,27 +2,29 @@ import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { formatCurrencyInput } from "../../utils/formatCurrency";
-//import { storeListChildren } from "../../controllers/productsController";
+import uuid from 'react-native-uuid';
 
 type typePropsModal = {
     onChange: (value: boolean) => void;
     value: boolean
-    childData: React.Dispatch<React.SetStateAction<{ name: string; goal: number, produced: number }[]>>;
+    childData: React.Dispatch<React.SetStateAction<{ key : string , name: string; goal: number, produced: number }[]>>;
     title: string
     textBtn: string
-    selectedChildGoal?: { name: string; goal: number, produced: number };
+    selectedChildGoal?: { key : string , name: string; goal: number, produced: number };
     producedModal: boolean,
-    hasChildrenGoals: boolean
+    hasChildrenGoals: boolean,    
+    editingChildIndex? : number
 };
 
 
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, hasChildrenGoals }: typePropsModal) => {
+export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex }: typePropsModal) => {
+    
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
     const [goalChildren, SetGoalChildren] = useState('')
     const [producedChildren, setProducedChildren] = useState('')
-    const [newProduction, setNewProduction] = useState('')   
+    const [newProduction, setNewProduction] = useState('')
 
     const handleChangeInput = (text: string) => {
         if (producedModal) {
@@ -34,27 +36,27 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
         }
     };
 
-    console.log(`Valor de selectedChildGoal ${selectedChildGoal?.goal}`)
-
+  
     useEffect(() => {
 
         if (selectedChildGoal) {
-            
+
             SetNameProductChildren(selectedChildGoal.name);
             SetGoalChildren(formatCurrencyInput(selectedChildGoal.goal));
             if (selectedChildGoal.produced !== null) {
                 setProducedChildren(formatCurrencyInput(selectedChildGoal.produced))
             }
 
-           
+
         }
     }, [selectedChildGoal]);
 
-   
+
 
     const ListChildren = () => {
 
         try {
+
             
 
             if (!nameProductChildren.trim() || !goalChildren.trim()) {
@@ -65,21 +67,22 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
             let goal = parseFloat(goalChildren.replace(/\./g, '').replace(',', '.'))
             let produced = parseFloat(producedChildren.replace(/\./g, '').replace(',', '.'))
-            let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))         
+            let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))
             const previousProduced = selectedChildGoal?.produced || 0;
-            const childProduced = previousProduced + newProducedValue;           
+            const childProduced = previousProduced + newProducedValue;
 
             const newChild = {
+                key : selectedChildGoal?.key? selectedChildGoal.key : uuid.v4(),
                 name: nameProductChildren,
                 goal: goal,
                 produced: producedModal ? childProduced : produced
             }
 
-            childData(prev => [...prev, newChild])
-        
-            Alert.alert('Produto Adicionado')
-            onChange(false)
+            childData(prev => [...prev, newChild])       
+                             
 
+            Alert.alert('Produto Adicionado')
+            onChange(false)            
             return newChild
 
         } catch (error) {

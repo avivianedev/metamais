@@ -20,7 +20,7 @@ const NewProduct = () => {
     const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
     const [showChildModal, setShowChildModal] = useState(false)
-    const [dataChildGoals, setDataChildGoals] = useState<{ name: string; goal: number, produced: number }[]>([]);
+    const [dataChildGoals, setDataChildGoals] = useState<{ key : string , name: string; goal: number, produced: number }[]>([]);
 
     
 
@@ -112,6 +112,7 @@ const NewProduct = () => {
                 hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
                 producedModal={false}
+               
             />
 
             }

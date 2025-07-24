@@ -4,16 +4,15 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from "react";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../../context/AppContext";
 
 
 
 const Header = () => {
 
-    const { search, setSearch } = useApp();
-
-    //console.log('Valor do inputSearch', search)
-
+    console.log('Settings component re-rendered');
+    const { search, setSearch , userName} = useApp();
+    
     return (
         <LinearGradient
             colors={['#6C5DD3', '#8E7EFF']}
@@ -22,7 +21,7 @@ const Header = () => {
             style={styles.headerContainer}>
 
             <View style={styles.introContainer}>
-                <Text style={styles.title}>Olá, Gabi</Text>
+                <Text style={styles.title}>Olá, {userName}</Text>
                 <Text style={styles.subtitle}>Uma meta por vez. Você chega lá!</Text>
             </View>
             <View style={styles.inputContainer}>
@@ -30,6 +29,8 @@ const Header = () => {
                 <TextInput style={styles.input}
                 value={search}
                 onChangeText={text => setSearch(text)}
+                autoFocus={false}
+                
                 
                 ></TextInput>
             </View>
@@ -88,6 +89,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
+        
 
 
     }

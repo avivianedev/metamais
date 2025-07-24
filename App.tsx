@@ -6,9 +6,9 @@ import { Inter_400Regular, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import Card from './src/components/Card/Card';
 import Home from './src/views/Home/Home';
 import { AppRoutes } from './src/routes/app.routes';
-
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { SearchProvider } from './src/components/context/AppContext';
+
+
 
 
 export default function App() {
@@ -25,7 +25,7 @@ export default function App() {
 
 
   return (
-    <SearchProvider>
+   
     <View style={styles.container}>
       <Header />
 
@@ -35,7 +35,7 @@ export default function App() {
       </ActionSheetProvider>
 
     </View>
-    </SearchProvider>
+   
 
   );
 }

@@ -46,6 +46,7 @@ const NewProduct = () => {
             remaining: sanitizeCurrencyInput(parentGoal),
             percent: 0,
             hasChildren: hasChildrenGoals,
+            goalAchieved: false,
             children: dataChildGoals
         };
 

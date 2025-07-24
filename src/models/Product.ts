@@ -6,6 +6,7 @@ export interface Product {
     produced: number;
     remaining: number;
     percent: number,
+    goalAchieved : boolean,
     hasChildren: boolean,
     children?: { key : string, name: string; goal: number, produced: number }[];
 }

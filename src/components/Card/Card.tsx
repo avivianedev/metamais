@@ -3,14 +3,14 @@ import { Inter_400Regular } from '@expo-google-fonts/inter';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { use, useEffect, useState } from "react";
 import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
-
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { EditProductModal } from "../Modal/EditProductModal";
 import { getItem } from "../../controllers/productsController";
 import { Product } from "../../models/Product";
 import { calculateMissing, calculatePercentage } from "../../utils/metricsUtils";
-import { useApp } from "../context/AppContext";
-import Feather from '@expo/vector-icons/Feather';
+import { useApp } from "../../context/AppContext";
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 
 
@@ -155,7 +155,9 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                                             <Text style={styles.childMissing}>Falta: {formatCurrencyInput(calculateMissing(child.produced, child.goal).missing)}</Text>
                                             <View style={styles.metaStatusView}>
                                                 <Text style={styles.childPercent}>{calculatePercentage(child.produced, child.goal)} %</Text>
-                                                {child.produced >= child.goal && ( <Feather name="check" size={18} color="#007200" />)} 
+                                                {child.produced >= child.goal 
+                                                ? ( <Entypo name="check" size={18} color="#007200" />) 
+                                                : <MaterialCommunityIcons name="progress-check" size={24} color="#007AFF" />} 
                                                
                                             </View>
                                             
@@ -280,6 +282,9 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 14,
         fontWeight: 600,
+    },
+    check: {
+        fontWeight:'900'
     },
     childMissing: {
         fontSize: 12,

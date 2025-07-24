@@ -8,7 +8,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Product } from '../../models/Product';
 import { formatCurrency } from '../../utils/formatCurrency';
 import { useFocusEffect } from '@react-navigation/native';
-import { useApp } from '../../components/context/AppContext';
+import { useApp } from '../../context/AppContext';
+
 
 
 export default function Home() {

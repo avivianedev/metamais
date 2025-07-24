@@ -7,7 +7,7 @@ import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../.
 import { Product } from "../../models/Product";
 import { getItem, storeData } from "../../controllers/productsController";
 import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../../context/AppContext";
 
 
 type editProps = {
@@ -56,7 +56,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             produced: producedModal ? previousProduced + newProduced : newProduced,
             remaining: parseFloat(parentGoal.replace(/\./g, '')),
             percent: 0,
-            hasChildren: hasChildrenGoals,
+            hasChildren: hasChildrenGoals,  
+            goalAchieved : previousProduced > parseFloat(parentGoal) ? true : false,         
             children: updatedChildren
 
         };

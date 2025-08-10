@@ -2,12 +2,14 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEffect, useState } from "react"
-import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
+import { Children, useEffect, useState } from "react"
+import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/format/formatCurrency";
 import { Product } from "../../models/Product";
-import { getItem, storeData } from "../../controllers/productsController";
+import { deleteProduct, getItem, storeData } from "../../controllers/productsController";
 import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
 import { useApp } from "../../context/AppContext";
+import { ButtonForm } from "../ButtonForm/ButtonForm";
+
 
 
 type editProps = {
@@ -31,6 +33,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
     const [paretProduced, setParentProduced] = useState('')
 
     const [showChildGoalModal, setShowChildGoalModal] = useState(false)
+    const [isProductListEmpty, setIsProductListEmpty] = useState(false)
 
     const [hasChildrenGoals, setHasChildrenGoals] = useState(data[0].hasChildren)
     const [editingChildIndex, setEditingChildIndex] = useState<number | null>(null);
@@ -41,14 +44,13 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
     const handleUpdate = async () => {
 
-        // const updatedChildren = data[0].children.map(
-        //     (item: { name: string; goal: number }, index: number) =>
-        //         index === editingChildIndex ? dataChild[0] : item
-        // );
+        const date = new Date()
 
         const product: Product = {
             id: data[0].id,
             name: parentName,
+            created: data[0]?.created ?? undefined,
+            updated: date,
             segment: segment,
             goal: hasChildrenGoals
                 ? updatedChildren.reduce((acc: any, child: any) => acc + (child.goal || 0), 0)
@@ -56,8 +58,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             produced: producedModal ? previousProduced + newProduced : newProduced,
             remaining: parseFloat(parentGoal.replace(/\./g, '')),
             percent: 0,
-            hasChildren: hasChildrenGoals,  
-            goalAchieved : previousProduced > parseFloat(parentGoal) ? true : false,         
+            hasChildren: hasChildrenGoals,
+            goalAchieved: previousProduced > parseFloat(parentGoal) ? true : false,
             children: updatedChildren
 
         };
@@ -65,14 +67,13 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
         const result = await storeData(product);
 
         if (result) {
-            Alert.alert('Produto Alterado com sucesso!')
+            producedModal ? Alert.alert('Produção Cadastrada com sucesso!') : Alert.alert('Produto Alterado com sucesso!')
+            
             onClose()
             setRefreshList(prev => !prev);
         }
 
     }
-
-
 
     const openChildGoalForm = (id: number, type: 'edit' | 'production') => {
         if (type === 'edit') {
@@ -82,6 +83,30 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             setShowChildGoalModal(true)
             setEditingChildIndex(id)
         }
+    }
+
+    const handleDeleteItem = async (index: number) => {
+        const removedChild = data[0].children.splice(index, 1)
+        const updatedChildren = data[0].children.filter((f: any) => f !== removedChild)
+        setUpdatedChildren(updatedChildren)
+
+        const totalChildrenGoals = updatedChildren.reduce((acc: any, child: any) => acc + (child.goal || 0), 0);
+        setParentGoal(formatCurrencyInput(totalChildrenGoals));
+
+        const result = JSON.stringify(removedChild[0].name)
+        Alert.alert(`Produto removido: ${JSON.parse(result)}`)
+
+        if (updatedChildren.length < 1) {
+            setIsProductListEmpty(true)
+        }
+
+    }
+
+    const handleDeleteProductEmpty = async () =>{        
+        const id = data[0].id
+        await deleteProduct(id)   
+        onClose()
+        setRefreshList(prev => !prev);
     }
 
     useEffect(() => {
@@ -115,7 +140,6 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
         if (dataChild.length > 0) {
             const updatedList = [...updatedChildren];
 
-            // Substitui ou atualiza os filhos com base na chave
             dataChild.forEach((newChild) => {
                 const indexToUpdate = updatedList.findIndex(item => item.key === newChild.key);
 
@@ -125,7 +149,6 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                         ...newChild,
                     };
                 } else {
-                    // Caso esteja adicionando uma nova meta filha
                     updatedList.push(newChild);
                 }
             });
@@ -135,12 +158,11 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
             const totalChildrenGoals = updatedList.reduce((acc, child) => acc + (child.goal || 0), 0);
             setParentGoal(formatCurrencyInput(totalChildrenGoals));
         }
-    }, [dataChild])  
+    }, [dataChild])
 
     return (
 
         <View style={styles.inputContainer}>
-
 
             <Text style={styles.title}>{title}</Text>
 
@@ -193,13 +215,18 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
                     />
                 </>
+            }          
+
+            {isProductListEmpty ? <ButtonForm
+                title="Deletar Produto"
+                onPress={handleDeleteProductEmpty}
+            />
+                :
+                <ButtonForm
+                    title="Alterar"
+                    onPress={handleUpdate}
+                />
             }
-
-            <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-                <Text style={styles.buttonText}>Alterar</Text>
-            </TouchableOpacity>
-
-
 
             {hasChildrenGoals && (
 
@@ -229,6 +256,10 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                                             onPress={() => openChildGoalForm(index, 'production')} >
                                             <Ionicons name="add-circle-outline" size={24} color="#57C3FF" />
                                         </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => openChildGoalForm(index, 'edit')} >
+                                            <Feather name="edit" size={20} color="#FFCA3A" />
+                                        </TouchableOpacity>
                                     </View>
                                     :
                                     <View style={styles.boxIcons}>
@@ -236,8 +267,9 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                                             onPress={() => openChildGoalForm(index, 'edit')} >
                                             <Feather name="edit" size={20} color="#FFCA3A" />
                                         </TouchableOpacity>
-                                        <TouchableOpacity>
-                                            <Feather name="trash" size={20} color="#FF595E" />
+                                        <TouchableOpacity
+                                            onPress={() => handleDeleteItem(index)} >
+                                            <Feather name="trash" size={20} color="#FF4D4D" />
                                         </TouchableOpacity>
                                     </View>
                                 }

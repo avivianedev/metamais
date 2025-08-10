@@ -6,7 +6,7 @@ import Card from '../../components/Card/Card';
 import { clearAllProducts, getData, getItem } from '../../controllers/productsController';
 import { useCallback, useEffect, useState } from 'react';
 import { Product } from '../../models/Product';
-import { formatCurrency } from '../../utils/formatCurrency';
+import { formatCurrency } from '../../utils/format/formatCurrency';
 import { useFocusEffect } from '@react-navigation/native';
 import { useApp } from '../../context/AppContext';
 
@@ -15,10 +15,7 @@ import { useApp } from '../../context/AppContext';
 export default function Home() {
 
   const [products, setProducts] = useState<Product[]>([]);
-  //const [refreshList, setRefreshList] = useState(false);
-
   const { search, refreshList  } = useApp (); 
-
 
   const searchResult = search ? products.filter(item => {
     return item.name.toLowerCase().includes(search.toLowerCase()) ||

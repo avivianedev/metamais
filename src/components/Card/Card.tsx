@@ -1,16 +1,15 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Inter_400Regular } from '@expo-google-fonts/inter';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { use, useEffect, useState } from "react";
-import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
+import { useState } from "react";
+import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/format/formatCurrency";
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { EditProductModal } from "../Modal/EditProductModal";
 import { getItem } from "../../controllers/productsController";
-import { Product } from "../../models/Product";
-import { calculateMissing, calculatePercentage } from "../../utils/metricsUtils";
-import { useApp } from "../../context/AppContext";
+import { calculateMissing, calculatePercentage } from "../../utils/metrics/metricsUtils";
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { ConfirmDiolag } from "../Modal/ConfirmDialog";
 
 
 
@@ -20,19 +19,22 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
     const { showActionSheetWithOptions } = useActionSheet();
     const [showEditModal, setShowEditModal] = useState(false)
     const [dataRecoverer, setDataRecoverer] = useState<any | null>(null)
-    const [showNewProductionModal, setShowNewProductionModal] = useState(false)    
+    const [showNewProductionModal, setShowNewProductionModal] = useState(false)
+    const [showNewDeleteModal, setShowNewDeleteModal] = useState(false)
+    const [confirmDiolagModalVisible, setConfirmDiolagModalVisible] = useState(false);
+
 
     let producedFormater = parseFloat(produced)
     let valueFormater = parseFloat(goal)
 
-    
-    const handleGetItem = async (id: string, type: 'edit' | 'production') => {
+    const handleGetItem = async (id: string, type: 'edit' | 'production' | 'delete') => {
         const selectedProduct = await getItem(id)
         setDataRecoverer(selectedProduct)
 
         setTimeout(() => {
             if (type === 'edit') setShowEditModal(true);
-            else setShowNewProductionModal(true);
+            if (type === 'production') setShowNewProductionModal(true);
+            if (type === 'delete') setConfirmDiolagModalVisible(true)
         }, 0);
     }
 
@@ -57,7 +59,7 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                         handleGetItem(id, 'production')
                         break;
                     case 2:
-                        // nova meta
+                        handleGetItem(id, 'delete')
                         break;
                 }
             }
@@ -104,6 +106,22 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                 />
             </Modal>
 
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={confirmDiolagModalVisible}
+                onRequestClose={() => setConfirmDiolagModalVisible(false)}
+                
+
+            >
+                <ConfirmDiolag
+                    texto="Excluir Produto?"
+                    visible={confirmDiolagModalVisible}
+                    onClose={() => setConfirmDiolagModalVisible(false)}
+                    data={dataRecoverer}
+                />
+            </Modal>
+
             <TouchableOpacity
                 onLongPress={showOptionsMenu}
                 style={[isLarge ? styles.largeCard : styles.smallCard]}
@@ -140,14 +158,14 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
 
                                 {children.map((child: { name: string, goal: number, produced: number }, index: number) => (
 
-                                    
+
                                     <View style={styles.childContent} key={index}>
-                                        
+
                                         <View style={styles.childValues} key={index}>
                                             <Text style={styles.childName}>{child.name}</Text>
-                                            
+
                                             <Text style={styles.produced}>Prod: {formatCurrency(child.produced)}</Text>
-                                            
+
 
 
                                         </View>
@@ -155,12 +173,12 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                                             <Text style={styles.childMissing}>Falta: {formatCurrencyInput(calculateMissing(child.produced, child.goal).missing)}</Text>
                                             <View style={styles.metaStatusView}>
                                                 <Text style={styles.childPercent}>{calculatePercentage(child.produced, child.goal)} %</Text>
-                                                {child.produced >= child.goal 
-                                                ? ( <Entypo name="check" size={18} color="#007200" />) 
-                                                : <MaterialCommunityIcons name="progress-check" size={24} color="#007AFF" />} 
-                                               
+                                                {child.produced >= child.goal
+                                                    ? (<Entypo name="check" size={18} color="#007200" />)
+                                                    : <MaterialCommunityIcons name="progress-check" size={24} color="#007AFF" />}
+
                                             </View>
-                                            
+
 
                                         </View>
                                     </View>
@@ -253,8 +271,8 @@ const styles = StyleSheet.create({
         borderColor: '#6c72FF',
         borderRadius: 10,
         padding: 10,
-        
-        
+
+
         //backgroundColor: '#D7C7FF'
     },
     childValues: {
@@ -284,7 +302,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
     },
     check: {
-        fontWeight:'900'
+        fontWeight: '900'
     },
     childMissing: {
         fontSize: 12,
@@ -294,7 +312,7 @@ const styles = StyleSheet.create({
     },
     metaStatusView: {
         flexDirection: 'row',
-        alignItems : 'center'
+        alignItems: 'center'
     },
     producedValues: {
         display: 'flex',

@@ -9,7 +9,8 @@ import { SucessMessage } from "../../components/Modal/SucessMessage";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { AddChildrenGoals } from "./AddChildrenGoals";
 import { FormProduct } from "../../components/FormProduct/FormProduct";
-import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/formatCurrency";
+import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/format/formatCurrency";
+import { getFormattedDateTime } from "../../utils/format/formatDate";
 
 
 const NewProduct = () => {
@@ -20,9 +21,9 @@ const NewProduct = () => {
     const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
     const [showChildModal, setShowChildModal] = useState(false)
-    const [dataChildGoals, setDataChildGoals] = useState<{ key : string , name: string; goal: number, produced: number }[]>([]);
+    const [dataChildGoals, setDataChildGoals] = useState<{ key: string, name: string; goal: number, produced: number }[]>([]);
 
-    
+
 
     const clearForm = () => {
 
@@ -35,8 +36,11 @@ const NewProduct = () => {
 
     const handleSubmit = async () => {
 
+        const date = new Date()
+
         const product: Product = {
             id: uuid.v4(),
+            created: date,
             name: parentName,
             segment: segment,
             //goal: parseFloat(goal.replace(/\./g, '').replace(',', '.').replace(',', '')),
@@ -92,18 +96,21 @@ const NewProduct = () => {
                     value={hasChildrenGoals}
                     onChange={setHasChildrenGoals}
                 />
-                <Text >Esse produto possui metas vinculadas</Text>
+                <Text style={styles.checkboxLabel} >Esse produto possui metas vinculadas</Text>
             </View>
 
 
             {hasChildrenGoals &&
 
-                <View style={styles.childrenGoals}>
-                    <TouchableOpacity onPress={() => setShowChildModal(!showChildModal)}>
-                        <AntDesign name="pluscircleo" size={18} color="#3D3D3D" />
-                    </TouchableOpacity>
-                    <Text style={styles.TextchildrenGoals}>Adicionar a meta vinculada</Text>
-                </View>}
+
+                <TouchableOpacity
+                    style={styles.childrenGoals}
+                    onPress={() => setShowChildModal(!showChildModal)}>
+                    <AntDesign name="pluscircleo" size={18} color="#fff" />
+                    <Text style={styles.TextchildrenGoals}>Cadastrar meta vinculada</Text>
+
+                </TouchableOpacity>
+            }
 
             {showChildModal && <AddChildrenGoals
                 onChange={setShowChildModal}
@@ -113,7 +120,7 @@ const NewProduct = () => {
                 hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
                 producedModal={false}
-               
+
             />
 
             }
@@ -141,10 +148,15 @@ const NewProduct = () => {
             </ScrollView>
 
 
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                    <Text style={styles.buttonText}>Cadastrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={clearForm}>
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Cadastrar</Text>
-            </TouchableOpacity>
         </View>
     )
 }
@@ -155,16 +167,23 @@ export default NewProduct
 
 const styles = StyleSheet.create({
     container: {
-        padding: 15,
+        padding: 10,
         width: '100%',
         height: '100%',
         //justifyContent: 'center',
         alignItems: 'center',
         gap: 10,
+        paddingBottom: 30
+    },
+    buttonContainer: {
+        width: '100%',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10
     },
 
     button: {
-        width: '70%',
+        width: '35%',
         height: 48,
         borderWidth: 1,
         borderRadius: 10,
@@ -188,7 +207,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         gap: 10,
-        color: '#3D3D3D'
+        //color: 'red'
+    },
+    checkboxLabel: {
+        fontSize: 14,
+        fontWeight: '500',
+        marginBottom: 4,
+        color: '#5A31F4'
     },
     childrenGoals: {
         display: 'flex',
@@ -196,12 +221,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         gap: 14,
+        paddingVertical: 8,
+        //backgroundColor: '#4B2E83',
+        width: '70%',
+        borderWidth: 1.5,
+        //borderRadius: 10,
+        borderColor: '#20c997',
+        backgroundColor: '#20c997',
+        borderRadius: 20,
+        paddingHorizontal: 16,
+        //backgroundColor: "linear-gradient(90deg, #7B42F6, #5A31F4)"
+
     },
     TextchildrenGoals: {
         fontSize: 14,
         fontFamily: 'Inter_400Regular',
         textAlign: 'left',
-        color: '#3D3D3D',
+        color: '#fff',
+        fontWeight: '500',
         gap: 0,
     },
     renderDataChildContainer: {
@@ -217,7 +254,7 @@ const styles = StyleSheet.create({
         padding: 2
     }, scrollContainer: {
         padding: 20,
-        paddingBottom: 60, 
+        paddingBottom: 60,
     }
 })
 

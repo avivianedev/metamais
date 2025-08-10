@@ -34,7 +34,8 @@ export const FormProduct = ({
                 value={nameProduct}
                 onChangeText={setNameProduct}
                 style={styles.input}
-                placeholderTextColor={'black'}
+                placeholderTextColor={'#9E9E9E'}
+                
             />
 
             <TextInput
@@ -42,7 +43,7 @@ export const FormProduct = ({
                 value={segment}
                 onChangeText={setSegment}
                 style={styles.input}
-                placeholderTextColor={'black'}
+                placeholderTextColor={'#9E9E9E'}
 
             />
 
@@ -51,7 +52,7 @@ export const FormProduct = ({
                 value={goal}
                 onChangeText={setGoal}
                 style={styles.input}
-                placeholderTextColor={'black'}
+                placeholderTextColor={'#9E9E9E'}
                 editable={!hasChildrenGoals}
                 //keyboardType="numeric"
             />
@@ -62,31 +63,36 @@ export const FormProduct = ({
 
 const styles = StyleSheet.create({
     inputContainer: {
-        padding: 24,
+        //padding: 20,
         width: '100%',
         height: 'auto',
         //justifyContent: 'center',
         alignItems: 'center',
-        gap: 24,
+        gap: 24,        
+        borderRadius: 16,       
+        margin: 16,
     },
     title: {
-        fontSize: 18,
-        fontFamily: 'Inter_400Regular',
-        color: '#3D3D3D',
+        fontSize: 20,
+        fontFamily: 'Inter_400Regular',        
+        fontWeight: '700',
+        color: '#5A31F4'
 
     },
     input: {
         width: '90%',
-        borderColor: '#8E7EFF',
+        borderColor: '#5A31F4',
         //backgroundColor: "transparente",
-        borderWidth: 2,
+        borderWidth: 1,
         borderRadius: 10,
         alignItems: 'center',
+        justifyContent: 'center',
         paddingLeft: 10,
-        height: 38,
-        opacity: .5,
+        height: 44,
+        //opacity: .5,
         //marginTop: 25
-        fontWeight: 700
+        fontWeight: 700,
+        
 
     },
 

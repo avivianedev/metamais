@@ -2,20 +2,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Product } from "../models/Product";
 import { Alert } from "react-native";
 
+export const storeData = async (product: Product): Promise<boolean> => {
 
-export const storeData = async (product: Product): Promise<boolean> => {  
 
-
-    try {        
+    try {
 
         if (!product.name.trim() || !product.segment.trim() || !product.goal) {
             Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
             return false
-        }        
+        }
 
-        if(!product.produced) null
+        if (!product.produced) null
         const jsonValue = JSON.stringify(product);
-        console.log('Valor no storeData,' , jsonValue)
+        //console.log('Valor no storeData,', jsonValue)
         await AsyncStorage.setItem(`product-${product.id}`, jsonValue);
         console.log('Produto salvo com sucesso!');
         return true
@@ -53,7 +52,7 @@ export const getItem = async (key: string) => {
 
         if (filterKey) {
             const stores = await AsyncStorage.multiGet(filterKey);
-            const products = stores.map(([key, value]) => value && JSON.parse(value));            
+            const products = stores.map(([key, value]) => value && JSON.parse(value));
             return products
 
         } else {
@@ -70,4 +69,19 @@ export const getItem = async (key: string) => {
 
 export const clearAllProducts = async () => {
     await AsyncStorage.clear();
-} 
+}
+
+export const deleteProduct = async (id: string) => {
+    try {
+        await AsyncStorage.removeItem(`product-${id}`)
+        Alert.alert('Produto Removido')
+    } catch (error) {
+        console.log('Erro ao deletar Produto', error)
+
+    }
+
+}
+
+const migrateIfNeeded = () => {
+
+}

@@ -2,13 +2,14 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native"
 
 type buttonProps = {
     title : string
+    onPress: () => void | Promise<void>;
 
 }
 
-export const ButtonForm = ({title} : buttonProps) => {
+export const ButtonForm = ({title, onPress} : buttonProps) => {
 
     return (
-        <TouchableOpacity style={styles.button} >
+        <TouchableOpacity style={styles.button} onPress={onPress}>
             <Text style={styles.buttonText}>{title}</Text>
         </TouchableOpacity>
     )

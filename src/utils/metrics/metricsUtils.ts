@@ -1,4 +1,4 @@
-import { formatCurrencyInput, sanitizeCurrencyInput } from "./formatCurrency"
+import { formatCurrencyInput, sanitizeCurrencyInput } from "../format/formatCurrency"
 
 export const calculateMissing = (producao: number, metaFinal: number, children?: any) => {
 

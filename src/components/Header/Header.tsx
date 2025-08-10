@@ -3,19 +3,33 @@ import { Inter_400Regular } from '@expo-google-fonts/inter';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "../../context/AppContext";
+import { getUser } from "../../utils/storage/asyncStorageUser";
 
 
 
 const Header = () => {
 
     console.log('Settings component re-rendered');
-    const { search, setSearch , userName} = useApp();
-    
+    const { search, setSearch, userName, setUsername, buttonSecondaryColor } = useApp();
+
+    const handleGetItem = async () => {
+        const user = await getUser('user')
+        if (user) {
+            const parsedUser = JSON.parse(user);
+            setUsername(parsedUser)
+        }
+
+    }
+
+    useEffect(() => {
+        handleGetItem()
+    }, [])
+
     return (
         <LinearGradient
-            colors={['#6C5DD3', '#8E7EFF']}
+            colors={ buttonSecondaryColor ? ['#D62860', '#B82254'] :  ['#6C5DD3', '#8E7EFF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 2 }}
             style={styles.headerContainer}>
@@ -27,11 +41,11 @@ const Header = () => {
             <View style={styles.inputContainer}>
                 <AntDesign name="search1" size={18} color="white" />
                 <TextInput style={styles.input}
-                value={search}
-                onChangeText={text => setSearch(text)}
-                autoFocus={false}
-                
-                
+                    value={search}
+                    onChangeText={text => setSearch(text)}
+                    autoFocus={false}
+
+
                 ></TextInput>
             </View>
         </LinearGradient>
@@ -89,7 +103,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        
+
 
 
     }

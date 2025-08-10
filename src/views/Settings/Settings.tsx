@@ -1,24 +1,41 @@
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { clearAllProducts } from "../../controllers/productsController"
 import { useApp } from "../../context/AppContext"
-import { formatSize, getAsyncStorageSize } from "../../utils/asyncStorage"
-import { storeUser } from "../../utils/asyncStorageUser"
+import { formatSize, getAsyncStorageSize } from "../../utils/storage/asyncStorage"
+import { getUser, storeUser } from "../../utils/storage/asyncStorageUser"
 import { useEffect, useState } from "react"
 
 const Settings = () => {
 
     
-    const { userName, setUsername } = useApp()
+    const { userName, setUsername , buttonSecondaryColor, setButtonSecondaryColor} = useApp()
     const [nameInput, setNameInput] = useState('');
-    const [totalStorage, setTotalStorage] = useState<string>('...');       
+    const [totalStorage, setTotalStorage] = useState<string>('...')  
 
+        
     const saveUserName = async () => {
-
         storeUser(nameInput)
         setUsername(nameInput)
     }
 
+    const changeColor = async () => {
+        setButtonSecondaryColor(!buttonSecondaryColor)
+    }
+
+    
+    const handleGetItem = async () => {
+        const user = await getUser('user')
+        if(user){
+            const parsedUser = JSON.parse(user);
+            setNameInput(parsedUser)
+            
+        }
+       
+    }
+
     useEffect(() => {
+        handleGetItem()
+        
         setNameInput(userName)
         const formatedBytes = async () => {
         const bytesTotal = await getAsyncStorageSize()
@@ -55,6 +72,13 @@ const Settings = () => {
                     <Text style={styles.buttonText}>Salvar</Text>
                 </TouchableOpacity>
             </View>
+            <View style={styles.optionsSettings}>
+                <Text style={styles.subtitle}>Vermelho BRA</Text>
+                <TouchableOpacity style={styles.button} onPress={changeColor}>
+                    <Text style={styles.buttonText}>Ativar</Text>
+                </TouchableOpacity>
+            </View>
+            
 
 
 
@@ -73,9 +97,10 @@ const styles = StyleSheet.create({
         gap: 24
     },
     title: {
-        fontSize: 18,
-        fontFamily: 'Inter_400Regular',
-        color: '#3D3D3D',
+        fontSize: 20,
+        fontFamily: 'Inter_400Regular',        
+        fontWeight: '700',
+        color: '#5A31F4'
     },
     subtitle: {
         fontSize: 14,

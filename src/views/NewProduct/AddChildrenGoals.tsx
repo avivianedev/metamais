@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { formatCurrencyInput } from "../../utils/formatCurrency";
+import { formatCurrencyInput } from "../../utils/format/formatCurrency";
 import uuid from 'react-native-uuid';
 
 type typePropsModal = {
@@ -80,13 +80,15 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
             childData(prev => [...prev, newChild])       
                              
-
-            Alert.alert('Produto Adicionado')
+            producedModal ? Alert.alert('Produção Adicionada') : Alert.alert('Produto Adicionado')
+            
             onChange(false)            
             return newChild
 
         } catch (error) {
             console.log('Erro ao adicionar meta vinculada')
+            producedModal ? Alert.alert('Erro ao adicionar Produção') : Alert.alert('Erro ao adicionar meta vinculada')
+
         }
 
 
@@ -136,6 +138,12 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
 
 const styles = StyleSheet.create({
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
     container: {
         padding: 24,
         width: '100%',

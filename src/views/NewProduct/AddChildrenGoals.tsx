@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { formatCurrencyInput } from "../../utils/format/formatCurrency";
 import uuid from 'react-native-uuid';
+import { useApp } from "../../context/AppContext";
+import { purpleTheme, redTheme } from "../../context/theme";
 
 type typePropsModal = {
     onChange: (value: boolean) => void;
@@ -13,12 +15,13 @@ type typePropsModal = {
     selectedChildGoal?: { key : string , name: string; goal: number, produced: number };
     producedModal: boolean,
     hasChildrenGoals: boolean,    
-    editingChildIndex? : number
+    editingChildIndex? : number,
+   
 };
 
 
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex }: typePropsModal) => {
+export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex, }: typePropsModal) => {
     
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
@@ -26,6 +29,16 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
     const [producedChildren, setProducedChildren] = useState('')
     const [newProduction, setNewProduction] = useState('')
 
+    const { buttonSecondaryColor } = useApp();
+
+    const colorBorderCheck =
+        buttonSecondaryColor
+            ? { borderColor: '#fff' , backgroundColor: '#B82254' }
+            : { borderColor: '#6C5DD3' , backgroundColor : '#6C5DD3'}   
+
+
+    const theme = buttonSecondaryColor ? redTheme : purpleTheme
+    
     const handleChangeInput = (text: string) => {
         if (producedModal) {
             setProducedChildren(text);
@@ -97,7 +110,7 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
     return (
 
-        <View style={styles.container}>
+        <View style={[styles.container, {backgroundColor : theme.colors.bg.primary}]}>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity style={styles.iConClose} onPress={() => onChange(!value)} >
                 <AntDesign name="close" size={24} color="white" />
@@ -126,7 +139,7 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
             />
 
-            <TouchableOpacity style={styles.button} onPress={() => ListChildren()}>
+            <TouchableOpacity style={[styles.button, {backgroundColor: theme.colors.bg.secondary}]} onPress={() => ListChildren()}>
                 <Text style={styles.buttonText}>{textBtn}</Text>
             </TouchableOpacity>
 

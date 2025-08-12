@@ -11,20 +11,27 @@ import { StyleSheet, View } from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import Entypo from '@expo/vector-icons/Entypo';
 import Settings from '../views/Settings/Settings';
+import { useApp } from '../context/AppContext';
+import { purpleTheme, redTheme } from '../context/theme';
 
 
 export function AppRoutes() {
+
+    const { buttonSecondaryColor } = useApp();
+    const theme = buttonSecondaryColor ? redTheme : purpleTheme
+    
     return (
 
         <NavigationContainer >
             <Navigator screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
-                    backgroundColor: '#6C5DD3',
+                    backgroundColor: theme.colors.bg.primary,
                     
                 },
                 tabBarActiveTintColor: '#fff',
                 tabBarInactiveTintColor: '#ccc',
+                
                 
             }}
 
@@ -68,8 +75,7 @@ const style = StyleSheet.create({
         flex: 1,
         borderTopLeftRadius: 14,
         borderTopRightRadius: 14,
-        backgroundColor: '#6C5DD3'
-
+        //backgroundColor: {`${}`}
     },
     active:{
        

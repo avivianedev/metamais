@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Product } from "../../models/Product";
 import { getFormattedDateTime } from "../../utils/format/formatDate";
 import { formatCurrencyInput } from "../../utils/format/formatCurrency";
+import { Title } from "../../components/Title/Title";
 
 
 
@@ -31,8 +32,9 @@ const History = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Histórico de Atividades</Text>
-
+            <Title
+                title="Histórico de Atividades"
+            />
 
             <FlatList
 
@@ -115,13 +117,13 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
 
-    title: {
-        fontSize: 20,
-        fontFamily: 'Inter_400Regular',        
-        fontWeight: '700',
-        color: '#5A31F4'
+    // title: {
+    //     fontSize: 20,
+    //     fontFamily: 'Inter_400Regular',        
+    //     fontWeight: '700',
+    //     color: '#5A31F4'
 
-    },
+    // },
     activityCardContainer: {
         width: '100%',
         marginBottom: 12,

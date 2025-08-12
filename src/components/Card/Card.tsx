@@ -10,6 +10,8 @@ import { calculateMissing, calculatePercentage } from "../../utils/metrics/metri
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { ConfirmDiolag } from "../Modal/ConfirmDialog";
+import { useApp } from "../../context/AppContext";
+import { redTheme, purpleTheme } from "../../context/theme";
 
 
 
@@ -22,6 +24,11 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
     const [showNewProductionModal, setShowNewProductionModal] = useState(false)
     const [showNewDeleteModal, setShowNewDeleteModal] = useState(false)
     const [confirmDiolagModalVisible, setConfirmDiolagModalVisible] = useState(false);
+
+    const { buttonSecondaryColor } = useApp();
+
+    const colorTheme = buttonSecondaryColor ? redTheme : purpleTheme
+        
 
 
     let producedFormater = parseFloat(produced)
@@ -111,7 +118,7 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                 transparent={true}
                 visible={confirmDiolagModalVisible}
                 onRequestClose={() => setConfirmDiolagModalVisible(false)}
-                
+
 
             >
                 <ConfirmDiolag
@@ -124,13 +131,13 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
 
             <TouchableOpacity
                 onLongPress={showOptionsMenu}
-                style={[isLarge ? styles.largeCard : styles.smallCard]}
+                style={[styles.largeCard, {borderColor : colorTheme.colors.border.primary}]}
 
 
             >
                 <View style={styles.cardHeader}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.title}>% {children?.length
+                    <Text style={[styles.title, {color : colorTheme.colors.text.primary}]}>{title}</Text>
+                    <Text style={[styles.title,  {color : colorTheme.colors.text.primary} ]}>% {children?.length
                         ? calculatePercentage(children, goal, children)
                         : calculatePercentage(producedFormater, valueFormater)}</Text>
                 </View>
@@ -159,10 +166,10 @@ const Card = ({ isLarge, id, title, percent, goal, missing, children, produced }
                                 {children.map((child: { name: string, goal: number, produced: number }, index: number) => (
 
 
-                                    <View style={styles.childContent} key={index}>
+                                    <View style={[styles.childContent , {borderColor : colorTheme.colors.border.primary}]} key={index}>
 
                                         <View style={styles.childValues} key={index}>
-                                            <Text style={styles.childName}>{child.name}</Text>
+                                            <Text style={[styles.childName , {color : colorTheme.colors.text.primary}]}>{child.name}</Text>
 
                                             <Text style={styles.produced}>Prod: {formatCurrency(child.produced)}</Text>
 
@@ -212,7 +219,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         //borderColor: '#003459',
         borderColor: '#6c72FF',
-        borderWidth: 1,
+        borderWidth: 1.5,
         marginBottom: 16
 
 
@@ -248,9 +255,10 @@ const styles = StyleSheet.create({
 
     },
     value: {
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: 'Inter_400Regular',
-        color: '#212C4D'
+        color: '#6B7280',
+        fontWeight: 700,
     },
     BtnArrow: {
         width: '100%',
@@ -305,10 +313,10 @@ const styles = StyleSheet.create({
         fontWeight: '900'
     },
     childMissing: {
-        fontSize: 12,
-        fontWeight: 600,
+        fontSize: 14,
+        fontWeight: 900,
         fontFamily: 'Inter_400Regular',
-        color: '#101935'
+        color: '#6B7280'
     },
     metaStatusView: {
         flexDirection: 'row',

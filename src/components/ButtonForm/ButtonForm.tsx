@@ -1,15 +1,37 @@
 import { StyleSheet, Text, TouchableOpacity } from "react-native"
 
+type ButtonSize = 'sm' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'third';
+
 type buttonProps = {
-    title : string
+    size?: ButtonSize
+    variant?: ButtonVariant;
+    title: string
     onPress: () => void | Promise<void>;
 
 }
 
-export const ButtonForm = ({title, onPress} : buttonProps) => {
+export const ButtonForm = ({ title, onPress, size = 'sm', variant = 'primary' }: buttonProps) => {
+
+    const bgByVariant = {
+        primary: '#8D7EFF',
+        secondary: '#BF3865',
+        third: '#6C5DD3',
+    }[variant];
+
+    const textByVariant = {
+        primary: '#FFFFFF',
+        secondary: '#5A31F4',
+        third: '#5A31F4',
+    }[variant];
+
+    const sizeStyle =
+        size === 'lg'
+            ? { width: 250 }
+            : { width: 150};
 
     return (
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity style={[styles.button, {backgroundColor: bgByVariant}, sizeStyle]} onPress={onPress}>
             <Text style={styles.buttonText}>{title}</Text>
         </TouchableOpacity>
     )
@@ -18,7 +40,7 @@ export const ButtonForm = ({title, onPress} : buttonProps) => {
 
 const styles = StyleSheet.create({
     button: {
-        width: '70%',
+        width: '35%',
         height: 48,
         borderWidth: 1,
         borderRadius: 10,

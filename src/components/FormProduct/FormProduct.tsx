@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { StyleSheet, Text, TextInput, View } from "react-native"
+import { useApp } from "../../context/AppContext";
+import { Title } from "../Title/Title";
 
 type FormProductProps = {
-    title: string;
+    //title: string;
     nameProduct: string;
     setNameProduct: (value: string) => void;
     segment: string;
@@ -13,7 +15,7 @@ type FormProductProps = {
 };
 
 export const FormProduct = ({
-    title,
+    //title,
     nameProduct,
     setNameProduct,
     segment,
@@ -25,15 +27,25 @@ export const FormProduct = ({
     
 ) => {    
 
+    const { buttonSecondaryColor } = useApp();
+
+    const colorBorder =
+        buttonSecondaryColor
+            ? { borderColor: '#B82254', }
+            : { borderColor: '#5A31F4', }
+    
+
     return (
         <View style={styles.inputContainer}>
-            <Text style={styles.title}>{title}</Text>
+            <Title 
+                title="Cadastro de Produtos"
+            />
 
             <TextInput
                 placeholder="Nome do Produto"
                 value={nameProduct}
                 onChangeText={setNameProduct}
-                style={styles.input}
+                style={[styles.input, colorBorder]}
                 placeholderTextColor={'#9E9E9E'}
                 
             />
@@ -42,7 +54,7 @@ export const FormProduct = ({
                 placeholder="Nome do Segmento"
                 value={segment}
                 onChangeText={setSegment}
-                style={styles.input}
+                style={[styles.input, colorBorder]}
                 placeholderTextColor={'#9E9E9E'}
 
             />
@@ -51,7 +63,7 @@ export const FormProduct = ({
                 placeholder="Meta em R$"
                 value={goal}
                 onChangeText={setGoal}
-                style={styles.input}
+                style={[styles.input, colorBorder]}
                 placeholderTextColor={'#9E9E9E'}
                 editable={!hasChildrenGoals}
                 //keyboardType="numeric"
@@ -75,7 +87,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontFamily: 'Inter_400Regular',        
-        fontWeight: '700',
+        fontWeight: '500',
         color: '#5A31F4'
 
     },

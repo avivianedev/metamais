@@ -4,6 +4,7 @@ import { useApp } from "../../context/AppContext"
 import { formatSize, getAsyncStorageSize } from "../../utils/storage/asyncStorage"
 import { getUser, storeUser } from "../../utils/storage/asyncStorageUser"
 import { useEffect, useState } from "react"
+import { Title } from "../../components/Title/Title"
 
 const Settings = () => {
 
@@ -47,7 +48,9 @@ const Settings = () => {
     
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Configurações</Text>
+            <Title
+                title="Configurações"
+            />
 
             <View style={styles.optionsSettings}>
                 <Text style={styles.subtitle}>Total Armazenado</Text>
@@ -75,7 +78,7 @@ const Settings = () => {
             <View style={styles.optionsSettings}>
                 <Text style={styles.subtitle}>Vermelho BRA</Text>
                 <TouchableOpacity style={styles.button} onPress={changeColor}>
-                    <Text style={styles.buttonText}>Ativar</Text>
+                    <Text style={styles.buttonText}>{buttonSecondaryColor ? 'Off' : 'On'}</Text>
                 </TouchableOpacity>
             </View>
             

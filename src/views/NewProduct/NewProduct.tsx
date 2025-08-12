@@ -11,6 +11,9 @@ import { AddChildrenGoals } from "./AddChildrenGoals";
 import { FormProduct } from "../../components/FormProduct/FormProduct";
 import { formatCurrency, formatCurrencyInput, sanitizeCurrencyInput } from "../../utils/format/formatCurrency";
 import { getFormattedDateTime } from "../../utils/format/formatDate";
+import { useApp } from "../../context/AppContext";
+import { ButtonForm } from "../../components/ButtonForm/ButtonForm";
+
 
 
 const NewProduct = () => {
@@ -23,6 +26,12 @@ const NewProduct = () => {
     const [showChildModal, setShowChildModal] = useState(false)
     const [dataChildGoals, setDataChildGoals] = useState<{ key: string, name: string; goal: number, produced: number }[]>([]);
 
+    const { buttonSecondaryColor } = useApp();
+
+    const colorBorderCheck =
+        buttonSecondaryColor
+            ? { borderColor: '#B82254', backgroundColor: '#B82254' }
+            : { borderColor: '#20c997', backgroundColor: '#20c997' }    
 
 
     const clearForm = () => {
@@ -74,7 +83,7 @@ const NewProduct = () => {
         <View style={styles.container}>
 
             <FormProduct
-                title={'Cadastro de Produtos'}
+                //title={'Cadastro de Produtos'}
                 nameProduct={parentName}
                 setNameProduct={setParentName}
                 segment={segment}
@@ -95,21 +104,27 @@ const NewProduct = () => {
                 <Checkbox
                     value={hasChildrenGoals}
                     onChange={setHasChildrenGoals}
+                    variant={buttonSecondaryColor ? 'secondary' : 'primary'}
+                    colorBorder={buttonSecondaryColor ? 'secondary' : 'primary'}
                 />
-                <Text style={styles.checkboxLabel} >Esse produto possui metas vinculadas</Text>
+                <Text style={[styles.checkboxLabel, buttonSecondaryColor ? { color: '#3C3C3C' } : { color: '#5A31F4' }]} >Esse produto possui metas vinculadas</Text>
             </View>
 
 
             {hasChildrenGoals &&
 
+                <View style={styles.childrenGoalsSlot}>
 
-                <TouchableOpacity
-                    style={styles.childrenGoals}
-                    onPress={() => setShowChildModal(!showChildModal)}>
-                    <AntDesign name="pluscircleo" size={18} color="#fff" />
-                    <Text style={styles.TextchildrenGoals}>Cadastrar meta vinculada</Text>
+                    <TouchableOpacity
 
-                </TouchableOpacity>
+                        style={[styles.childrenGoals, colorBorderCheck, !hasChildrenGoals && styles.invisible]}
+                        //pointerEvents={hasChildrenGoals ? 'auto' : 'none'}
+                        onPress={() => setShowChildModal(!showChildModal)}>
+                        <AntDesign name="pluscircleo" size={18} color="#fff" />
+                        <Text style={styles.TextchildrenGoals}>Cadastrar meta vinculada</Text>
+
+                    </TouchableOpacity>
+                </View>
             }
 
             {showChildModal && <AddChildrenGoals
@@ -120,7 +135,7 @@ const NewProduct = () => {
                 hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
                 producedModal={false}
-
+                
             />
 
             }
@@ -149,12 +164,25 @@ const NewProduct = () => {
 
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <ButtonForm
+                    title="Cadastrar"
+                    onPress={handleSubmit}
+                    size="sm"
+                    variant={buttonSecondaryColor ? 'secondary' : 'third'}
+                />
+
+                <ButtonForm
+                    title="Cancelar"
+                    onPress={clearForm}
+                    size="sm"
+                    variant={buttonSecondaryColor ? 'secondary' : 'third'}
+                />
+                {/* <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <Text style={styles.buttonText}>Cadastrar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={clearForm}>
                     <Text style={styles.buttonText}>Cancelar</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
 
         </View>
@@ -210,17 +238,22 @@ const styles = StyleSheet.create({
         //color: 'red'
     },
     checkboxLabel: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: '500',
         marginBottom: 4,
         color: '#5A31F4'
+    },
+    childrenGoalsSlot: {
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     childrenGoals: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 14,
+        gap: 10,
         paddingVertical: 8,
         //backgroundColor: '#4B2E83',
         width: '70%',
@@ -232,7 +265,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         //backgroundColor: "linear-gradient(90deg, #7B42F6, #5A31F4)"
 
+
+
     },
+    invisible: { opacity: 0 },
     TextchildrenGoals: {
         fontSize: 14,
         fontFamily: 'Inter_400Regular',

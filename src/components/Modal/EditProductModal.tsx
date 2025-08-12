@@ -9,6 +9,7 @@ import { deleteProduct, getItem, storeData } from "../../controllers/productsCon
 import { AddChildrenGoals } from "../../views/NewProduct/AddChildrenGoals";
 import { useApp } from "../../context/AppContext";
 import { ButtonForm } from "../ButtonForm/ButtonForm";
+import { purpleTheme, redTheme } from "../../context/theme";
 
 
 
@@ -42,6 +43,9 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
     const previousProduced = parseFloat(data[0].produced || 0);
     const newProduced = parseFloat(paretProduced.replace(/\./g, ''));
 
+    const { buttonSecondaryColor } = useApp();
+    const colorTheme = buttonSecondaryColor ? redTheme : purpleTheme
+
     const handleUpdate = async () => {
 
         const date = new Date()
@@ -68,7 +72,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
         if (result) {
             producedModal ? Alert.alert('Produção Cadastrada com sucesso!') : Alert.alert('Produto Alterado com sucesso!')
-            
+
             onClose()
             setRefreshList(prev => !prev);
         }
@@ -102,9 +106,9 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
     }
 
-    const handleDeleteProductEmpty = async () =>{        
+    const handleDeleteProductEmpty = async () => {
         const id = data[0].id
-        await deleteProduct(id)   
+        await deleteProduct(id)
         onClose()
         setRefreshList(prev => !prev);
     }
@@ -162,39 +166,39 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
     return (
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer , {backgroundColor: colorTheme.colors.bg.primary}]}>
 
             <Text style={styles.title}>{title}</Text>
 
             <TouchableOpacity style={styles.iConClose} accessibilityLabel="Fechar modal" onPress={onClose} >
                 <AntDesign name="close" size={24} color="white" />
             </TouchableOpacity>
-            <Text style={styles.inputLabel}>Nome do Produto</Text>
+            <Text style={[styles.inputLabel, {color: colorTheme.colors.text.neutro}]}>Nome do Produto</Text>
             <TextInput
                 placeholder="Nome do Produto"
                 value={parentName}
                 onChangeText={setParentName}
-                style={styles.input}
+                style={[styles.input , {borderColor : colorTheme.colors.border.secondary}]}
                 placeholderTextColor={'white'}
                 editable={producedModal ? false : true}
             />
-            <Text style={styles.inputLabel}>Nome do Segmento</Text>
+            <Text style={[styles.inputLabel, {color: colorTheme.colors.text.neutro}]}>Nome do Segmento</Text>
             <TextInput
                 placeholder="Nome do Segmento"
                 value={segment}
                 onChangeText={setSegment}
-                style={styles.input}
+                style={[styles.input , {borderColor : colorTheme.colors.border.secondary}]}
                 placeholderTextColor={'white'}
                 editable={producedModal ? false : true}
 
             />
-            <Text style={styles.inputLabel}>Meta Final</Text>
+            <Text style={[styles.inputLabel, {color: colorTheme.colors.text.neutro}]}>Meta Final</Text>
 
             <TextInput
                 placeholder="Meta em R$"
                 value={parentGoal}
                 onChangeText={setParentGoal}
-                style={styles.input}
+                style={[styles.input , {borderColor : colorTheme.colors.border.secondary}]}
                 placeholderTextColor={'white'}
                 editable={producedModal ? false : true}
 
@@ -202,7 +206,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
             {!hasChildrenGoals && producedModal &&
                 <>
-                    <Text style={styles.inputLabel}>Nova Produção</Text>
+                    <Text style={[styles.inputLabel, {color: colorTheme.colors.text.neutro}]}>Nova Produção</Text>
 
                     <TextInput
                         placeholder="Valor em R$"
@@ -215,16 +219,18 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
                     />
                 </>
-            }          
+            }
 
             {isProductListEmpty ? <ButtonForm
                 title="Deletar Produto"
                 onPress={handleDeleteProductEmpty}
+                variant={buttonSecondaryColor ? 'secondary' : 'primary'}
             />
                 :
                 <ButtonForm
-                    title="Alterar"
+                    title={producedModal ? 'Cadastrar' : 'Alterar'}
                     onPress={handleUpdate}
+                    variant={buttonSecondaryColor ? 'secondary' : 'primary'}
                 />
             }
 
@@ -232,8 +238,8 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
 
                 <>
 
-                    <View style={styles.containerTextHeader}>
-                        <Text style={styles.containerText}>Produto</Text>
+                    <View style={[styles.containerTextHeader]}>
+                        <Text style={[styles.containerText]}>Produto</Text>
                         <Text style={styles.containerText}>{titleHeaderChild}</Text>
                         <Text style={styles.containerText}>Ação</Text>
                     </View>
@@ -329,12 +335,13 @@ const styles = StyleSheet.create({
     containerTextHeader: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        color: '#343B4F',
     },
 
     containerText: {
-        fontSize: 14,
-        fontWeight: 700,
+        fontSize: 15,
+        fontWeight: 900,
         fontFamily: 'Inter_400Regular',
         color: '#343B4F',
     },
@@ -351,7 +358,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         paddingLeft: 10,
-        height: 38,
+        height: 44,
         color: 'white',
         fontWeight: 700,
 

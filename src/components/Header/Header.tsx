@@ -11,7 +11,6 @@ import { getUser } from "../../utils/storage/asyncStorageUser";
 
 const Header = () => {
 
-    console.log('Settings component re-rendered');
     const { search, setSearch, userName, setUsername, buttonSecondaryColor } = useApp();
 
     const handleGetItem = async () => {

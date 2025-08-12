@@ -14,7 +14,7 @@ export const storeData = async (product: Product): Promise<boolean> => {
 
         if (!product.produced) null
         const jsonValue = JSON.stringify(product);
-        //console.log('Valor no storeData,', jsonValue)
+        
         await AsyncStorage.setItem(`product-${product.id}`, jsonValue);
         console.log('Produto salvo com sucesso!');
         return true

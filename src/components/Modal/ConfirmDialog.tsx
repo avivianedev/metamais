@@ -3,6 +3,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import React, { useEffect, useRef, useState } from 'react';
 import { deleteProduct } from "../../controllers/productsController";
 import { useApp } from "../../context/AppContext";
+import { purpleTheme, redTheme } from "../../context/theme";
 
 type ModalProps = {
     texto: string;
@@ -15,7 +16,9 @@ export const ConfirmDiolag = ({ texto, visible, onClose, data }: ModalProps) => 
 
 
     const [parentName, setParentName] = useState('')
-    const { setRefreshList  } = useApp(); 
+    const { setRefreshList , buttonSecondaryColor  } = useApp(); 
+
+    const theme = buttonSecondaryColor ? redTheme : purpleTheme
     
 
     const handleDeleteProduct = async () => {
@@ -55,19 +58,19 @@ export const ConfirmDiolag = ({ texto, visible, onClose, data }: ModalProps) => 
     return (
 
         <View style={styles.overlay}>
-            <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}>
+            <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }, {backgroundColor: theme.colors.accent.primary }]}>
                 <View style={styles.modalDialogContent}>
 
                     <Text style={styles.textTitle}>{texto}</Text>
                     <Text style={styles.text}>Isso vai remover o produto</Text>
-                    <Text style={styles.textName}>{parentName}</Text>
+                    <Text style={[styles.textName , {color : theme.colors.text.third}]}>{parentName}</Text>
                     <Text style={styles.text}>E todas metas associadas se existir.</Text>
 
                     <View style={styles.btnContainer}>
                         <TouchableOpacity onPress={onClose} style={styles.buttonCancel} >
                             <Text style={styles.btnText}>Cancelar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleDeleteProduct} style={styles.buttonDel}>
+                        <TouchableOpacity onPress={handleDeleteProduct} style={[styles.buttonDel, {borderColor : theme.colors.accent.danger}]}>
                             <Text style={styles.btnText}>Excluir</Text>
                         </TouchableOpacity>
 

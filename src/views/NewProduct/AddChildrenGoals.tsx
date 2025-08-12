@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { formatCurrencyInput } from "../../utils/format/formatCurrency";
+import { formatCurrency, formatCurrencyInput } from "../../utils/format/formatCurrency";
 import uuid from 'react-native-uuid';
 import { useApp } from "../../context/AppContext";
 import { purpleTheme, redTheme } from "../../context/theme";
@@ -9,36 +9,41 @@ import { purpleTheme, redTheme } from "../../context/theme";
 type typePropsModal = {
     onChange: (value: boolean) => void;
     value: boolean
-    childData: React.Dispatch<React.SetStateAction<{ key : string , name: string; goal: number, produced: number }[]>>;
+    childData: React.Dispatch<React.SetStateAction<{ key: string, name: string; goal: number, produced: number }[]>>;
     title: string
     textBtn: string
-    selectedChildGoal?: { key : string , name: string; goal: number, produced: number };
+    selectedChildGoal?: { key: string, name: string; goal: number, produced: number };
     producedModal: boolean,
-    hasChildrenGoals: boolean,    
-    editingChildIndex? : number,
-   
+    hasChildrenGoals: boolean,
+    editingChildIndex?: number,
+    stateEditting?: boolean
+
 };
 
 
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex, }: typePropsModal) => {
-    
+
+export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex, stateEditting }: typePropsModal) => {
+
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
     const [goalChildren, SetGoalChildren] = useState('')
     const [producedChildren, setProducedChildren] = useState('')
     const [newProduction, setNewProduction] = useState('')
 
+
+
     const { buttonSecondaryColor } = useApp();
+    const showProduced = stateEditting ? selectedChildGoal?.produced : newProduction
 
     const colorBorderCheck =
         buttonSecondaryColor
-            ? { borderColor: '#fff' , backgroundColor: '#B82254' }
-            : { borderColor: '#6C5DD3' , backgroundColor : '#6C5DD3'}   
+            ? { borderColor: '#fff', backgroundColor: '#B82254' }
+            : { borderColor: '#6C5DD3', backgroundColor: '#6C5DD3' }
 
 
     const theme = buttonSecondaryColor ? redTheme : purpleTheme
-    
+
     const handleChangeInput = (text: string) => {
         if (producedModal) {
             setProducedChildren(text);
@@ -49,8 +54,12 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
         }
     };
 
-  
+
     useEffect(() => {
+
+        if(stateEditting && selectedChildGoal?.produced !== undefined){
+            setNewProduction(formatCurrencyInput(selectedChildGoal.produced))
+        }
 
         if (selectedChildGoal) {
 
@@ -70,7 +79,7 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
         try {
 
-            
+
 
             if (!nameProductChildren.trim() || !goalChildren.trim()) {
                 Alert.alert('Campos obrigatórios', 'Preencha todos os campos antes de cadastrar.');
@@ -82,20 +91,20 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
             let produced = parseFloat(producedChildren.replace(/\./g, '').replace(',', '.'))
             let newProducedValue = parseFloat(newProduction.replace(/\./g, '').replace(',', '.'))
             const previousProduced = selectedChildGoal?.produced || 0;
-            const childProduced = previousProduced + newProducedValue;
+            const childProduced = stateEditting ? newProducedValue : previousProduced + newProducedValue;
 
             const newChild = {
-                key : selectedChildGoal?.key? selectedChildGoal.key : uuid.v4(),
+                key: selectedChildGoal?.key ? selectedChildGoal.key : uuid.v4(),
                 name: nameProductChildren,
                 goal: goal,
                 produced: producedModal ? childProduced : produced
             }
 
-            childData(prev => [...prev, newChild])       
-                             
+            childData(prev => [...prev, newChild])
+
             producedModal ? Alert.alert('Produção Adicionada') : Alert.alert('Produto Adicionado')
-            
-            onChange(false)            
+
+            onChange(false)
             return newChild
 
         } catch (error) {
@@ -105,12 +114,13 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
         }
 
 
+
     }
 
 
     return (
 
-        <View style={[styles.container, {backgroundColor : theme.colors.bg.primary}]}>
+        <View style={[styles.container, { backgroundColor: theme.colors.bg.primary }]}>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity style={styles.iConClose} onPress={() => onChange(!value)} >
                 <AntDesign name="close" size={24} color="white" />
@@ -139,7 +149,7 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
             />
 
-            <TouchableOpacity style={[styles.button, {backgroundColor: theme.colors.bg.secondary}]} onPress={() => ListChildren()}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.colors.bg.secondary }]} onPress={() => ListChildren()}>
                 <Text style={styles.buttonText}>{textBtn}</Text>
             </TouchableOpacity>
 

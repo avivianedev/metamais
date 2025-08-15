@@ -57,6 +57,7 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
 
     useEffect(() => {
 
+
         if(stateEditting && selectedChildGoal?.produced !== undefined){
             setNewProduction(formatCurrencyInput(selectedChildGoal.produced))
         }

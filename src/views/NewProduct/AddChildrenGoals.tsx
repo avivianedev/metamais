@@ -16,12 +16,13 @@ type typePropsModal = {
     producedModal: boolean,
     hasChildrenGoals: boolean,    
     editingChildIndex? : number,
+    isAddingProduct? : boolean
    
 };
 
 
 
-export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex, }: typePropsModal) => {
+export const AddChildrenGoals = ({ onChange, value, childData, title, selectedChildGoal, textBtn, producedModal, editingChildIndex, isAddingProduct }: typePropsModal) => {
     
 
     const [nameProductChildren, SetNameProductChildren] = useState('')
@@ -92,8 +93,12 @@ export const AddChildrenGoals = ({ onChange, value, childData, title, selectedCh
             }
 
             childData(prev => [...prev, newChild])       
-                             
-            producedModal ? Alert.alert('Produção Adicionada') : Alert.alert('Produto Adicionado')
+            if(isAddingProduct) {
+                Alert.alert('Produto Adicionado')
+            }  else {
+                producedModal ? Alert.alert('Produção Adicionada') : Alert.alert('Produto Alterado')
+            }              
+            
             
             onChange(false)            
             return newChild

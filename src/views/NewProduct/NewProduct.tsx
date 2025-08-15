@@ -25,13 +25,13 @@ const NewProduct = () => {
     const [hasChildrenGoals, setHasChildrenGoals] = useState(false)
     const [showChildModal, setShowChildModal] = useState(false)
     const [dataChildGoals, setDataChildGoals] = useState<{ key: string, name: string; goal: number, produced: number }[]>([]);
-
+    const [isAddingProduct, setIsAddingProduct] = useState(false)
     const { buttonSecondaryColor } = useApp();
 
     const colorBorderCheck =
         buttonSecondaryColor
             ? { borderColor: '#B82254', backgroundColor: '#B82254' }
-            : { borderColor: '#20c997', backgroundColor: '#20c997' }    
+            : { borderColor: '#8E7EFF', backgroundColor: '#1BAA88' }    
 
 
     const clearForm = () => {
@@ -135,6 +135,7 @@ const NewProduct = () => {
                 hasChildrenGoals={hasChildrenGoals}
                 textBtn={'Cadastrar'}
                 producedModal={false}
+                isAddingProduct={true}
                 
             />
 
@@ -259,8 +260,8 @@ const styles = StyleSheet.create({
         width: '70%',
         borderWidth: 1.5,
         //borderRadius: 10,
-        borderColor: '#20c997',
-        backgroundColor: '#20c997',
+        borderColor: '#20C997',
+        backgroundColor: '#20C997',
         borderRadius: 20,
         paddingHorizontal: 16,
         //backgroundColor: "linear-gradient(90deg, #7B42F6, #5A31F4)"

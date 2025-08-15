@@ -76,7 +76,7 @@ const Settings = () => {
                 </TouchableOpacity>
             </View>
             <View style={styles.optionsSettings}>
-                <Text style={styles.subtitle}>Vermelho BRA</Text>
+                <Text style={styles.subtitle}>Alterar tema</Text>
                 <TouchableOpacity style={styles.button} onPress={changeColor}>
                     <Text style={styles.buttonText}>{buttonSecondaryColor ? 'Off' : 'On'}</Text>
                 </TouchableOpacity>

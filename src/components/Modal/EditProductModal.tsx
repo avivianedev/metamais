@@ -42,6 +42,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
     const [updatedChildren, setUpdatedChildren] = useState(data[0].children);
     const previousProduced = parseFloat(data[0].produced || 0);
     const newProduced = parseFloat(paretProduced.replace(/\./g, ''));
+    const [stateEditting , setStateEditting] = useState(false)
 
     const { buttonSecondaryColor } = useApp();
     const colorTheme = buttonSecondaryColor ? redTheme : purpleTheme
@@ -83,6 +84,7 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
         if (type === 'edit') {
             setShowChildGoalModal(true)
             setEditingChildIndex(id)
+            setStateEditting(true)
         } else {
             setShowChildGoalModal(true)
             setEditingChildIndex(id)
@@ -298,11 +300,11 @@ export const EditProductModal = ({ onClose, data, title, titleHeaderChild, produ
                                 }}
                                 hasChildrenGoals={hasChildrenGoals}
                                 producedModal={producedModal}
-                                title="Atualizar Metas Vinculadas"
+                                title={producedModal  && !stateEditting ? 'Cadastrar Produção' : 'Alterar Metas' }
                                 textBtn='Atualizar'
                                 selectedChildGoal={data[0].children[editingChildIndex]}
                                 editingChildIndex={editingChildIndex}
-
+                                stateEditting={stateEditting}
 
 
                             />
@@ -331,6 +333,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#6C5DD3',
         gap: 10,
         borderRadius: 15,
+       
     },
     containerTextHeader: {
         width: '100%',
@@ -350,6 +353,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'Inter_400Regular',
         color: '#fff',
+        marginTop: 20
     },
     input: {
         width: '90%',
@@ -391,7 +395,7 @@ const styles = StyleSheet.create({
     },
     iConClose: {
         position: 'absolute',
-        top: 24,
+        top: 44,
         right: 24
     },
     renderDataChildContainer: {
